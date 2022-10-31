@@ -22,9 +22,11 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
       try {
         List<dynamic> msgs = jsonDecode(element);
         for (var msg in msgs) {
+          logInfo(msg);
           _serverMessageStream.add(ButtplugServerMessage.fromJson(msg));
         }
       } catch (e) {
+        logError(element);
         logError("Error adding message to stream: $e");
         await disconnect();
       }
@@ -38,7 +40,7 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
   }
 
   @override
-  void send(ButtplugClientMessage message) {
+  void send(ButtplugClientMessageUnion message) {
     String msg = jsonEncode([message]);
     _wsChannel!.sink.add(msg);
   }

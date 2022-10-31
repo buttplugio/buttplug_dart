@@ -214,6 +214,22 @@ Map<String, dynamic> _$RequestDeviceListToJson(RequestDeviceList instance) =>
       'Id': instance.id,
     };
 
+StartScanning _$StartScanningFromJson(Map<String, dynamic> json) =>
+    StartScanning()..id = json['Id'] as int;
+
+Map<String, dynamic> _$StartScanningToJson(StartScanning instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+    };
+
+StopScanning _$StopScanningFromJson(Map<String, dynamic> json) =>
+    StopScanning()..id = json['Id'] as int;
+
+Map<String, dynamic> _$StopScanningToJson(StopScanning instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+    };
+
 Ok _$OkFromJson(Map<String, dynamic> json) => Ok()..id = json['Id'] as int;
 
 Map<String, dynamic> _$OkToJson(Ok instance) => <String, dynamic>{
@@ -234,10 +250,27 @@ Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
       'MaxPingTime': instance.maxPingTime,
     };
 
+DeviceInfo _$DeviceInfoFromJson(Map<String, dynamic> json) => DeviceInfo()
+  ..deviceIndex = json['DeviceIndex'] as int
+  ..deviceName = json['DeviceName'] as String
+  ..deviceDisplayName = json['DeviceDisplayName'] as String?
+  ..messageTimingGap = json['MessageTimingGap'] as int?
+  ..deviceMessages = ClientDeviceMessageAttributes.fromJson(
+      json['DeviceMessages'] as Map<String, dynamic>);
+
+Map<String, dynamic> _$DeviceInfoToJson(DeviceInfo instance) =>
+    <String, dynamic>{
+      'DeviceIndex': instance.deviceIndex,
+      'DeviceName': instance.deviceName,
+      'DeviceDisplayName': instance.deviceDisplayName,
+      'MessageTimingGap': instance.messageTimingGap,
+      'DeviceMessages': instance.deviceMessages,
+    };
+
 DeviceList _$DeviceListFromJson(Map<String, dynamic> json) => DeviceList()
   ..id = json['Id'] as int
   ..devices = (json['Devices'] as List<dynamic>)
-      .map((e) => DeviceAdded.fromJson(e as Map<String, dynamic>))
+      .map((e) => DeviceInfo.fromJson(e as Map<String, dynamic>))
       .toList();
 
 Map<String, dynamic> _$DeviceListToJson(DeviceList instance) =>
@@ -323,9 +356,9 @@ Map<String, dynamic> _$ButtplugServerMessageToJson(
   return val;
 }
 
-ButtplugClientMessage _$ButtplugClientMessageFromJson(
+ButtplugClientMessageUnion _$ButtplugClientMessageUnionFromJson(
         Map<String, dynamic> json) =>
-    ButtplugClientMessage()
+    ButtplugClientMessageUnion()
       ..requestServerInfo = json['RequestServerInfo'] == null
           ? null
           : RequestServerInfo.fromJson(
@@ -336,10 +369,17 @@ ButtplugClientMessage _$ButtplugClientMessageFromJson(
               json['RequestDeviceList'] as Map<String, dynamic>)
       ..ping = json['Ping'] == null
           ? null
-          : Ping.fromJson(json['Ping'] as Map<String, dynamic>);
+          : Ping.fromJson(json['Ping'] as Map<String, dynamic>)
+      ..startScanning = json['StartScanning'] == null
+          ? null
+          : StartScanning.fromJson(
+              json['StartScanning'] as Map<String, dynamic>)
+      ..stopScanning = json['StopScanning'] == null
+          ? null
+          : StopScanning.fromJson(json['StopScanning'] as Map<String, dynamic>);
 
-Map<String, dynamic> _$ButtplugClientMessageToJson(
-    ButtplugClientMessage instance) {
+Map<String, dynamic> _$ButtplugClientMessageUnionToJson(
+    ButtplugClientMessageUnion instance) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
@@ -351,5 +391,7 @@ Map<String, dynamic> _$ButtplugClientMessageToJson(
   writeNotNull('RequestServerInfo', instance.requestServerInfo);
   writeNotNull('RequestDeviceList', instance.requestDeviceList);
   writeNotNull('Ping', instance.ping);
+  writeNotNull('StartScanning', instance.startScanning);
+  writeNotNull('StopScanning', instance.stopScanning);
   return val;
 }

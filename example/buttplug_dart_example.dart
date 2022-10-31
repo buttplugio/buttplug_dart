@@ -15,6 +15,13 @@ void main() async {
   logInfo("Connecting to server");
   await client.connect(connector);
   logInfo("Server connected");
+  await client.startScanning();
+  logInfo("Holding for scan");
+  await Future.delayed(Duration(seconds: 10));
+  logInfo("Devices:");
+  for (var device in client.devices.values) {
+    logInfo("- ${device.deviceName}");
+  }
   await client.disconnect();
   logInfo("Server disconnected");
 }

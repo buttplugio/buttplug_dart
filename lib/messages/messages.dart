@@ -4,7 +4,7 @@ import 'package:buttplug/messages/enums.dart';
 part 'messages.g.dart';
 
 class ButtplugMessageException implements Exception {
-  String message;
+  final String message;
   ButtplugMessageException(this.message);
 }
 
@@ -73,35 +73,78 @@ mixin ButtplugMessage {
   int id = 0;
 }
 
+abstract class ButtplugClientMessage with ButtplugMessage {
+  ButtplugClientMessageUnion asClientMessageUnion();
+}
+
 // Client Messages
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class RequestServerInfo with ButtplugMessage {
+class RequestServerInfo with ButtplugMessage implements ButtplugClientMessage {
   String clientName = "";
   // This will not change until we rev this message set, so set it statically.
   int messageVersion = 3;
   Map<String, dynamic> toJson() => _$RequestServerInfoToJson(this);
   factory RequestServerInfo.fromJson(Map<String, dynamic> json) => _$RequestServerInfoFromJson(json);
   RequestServerInfo();
-  ButtplugClientMessage asClientMessage() {
-    var msg = ButtplugClientMessage();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
     msg.requestServerInfo = this;
     return msg;
   }
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class Ping with ButtplugMessage {
+class Ping with ButtplugMessage implements ButtplugClientMessage {
   Map<String, dynamic> toJson() => _$PingToJson(this);
   factory Ping.fromJson(Map<String, dynamic> json) => _$PingFromJson(json);
   Ping();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.ping = this;
+    return msg;
+  }
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class RequestDeviceList with ButtplugMessage {
+class RequestDeviceList with ButtplugMessage implements ButtplugClientMessage {
   Map<String, dynamic> toJson() => _$RequestDeviceListToJson(this);
   factory RequestDeviceList.fromJson(Map<String, dynamic> json) => _$RequestDeviceListFromJson(json);
   RequestDeviceList();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.requestDeviceList = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class StartScanning with ButtplugMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$StartScanningToJson(this);
+  factory StartScanning.fromJson(Map<String, dynamic> json) => _$StartScanningFromJson(json);
+  StartScanning();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.startScanning = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class StopScanning with ButtplugMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$StopScanningToJson(this);
+  factory StopScanning.fromJson(Map<String, dynamic> json) => _$StopScanningFromJson(json);
+  StopScanning();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.stopScanning = this;
+    return msg;
+  }
 }
 
 // Server Messages
@@ -125,20 +168,27 @@ class ServerInfo with ButtplugMessage {
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
+class DeviceInfo {
+  int deviceIndex = 0;
+  String deviceName = "";
+  String? deviceDisplayName;
+  int? messageTimingGap;
+  ClientDeviceMessageAttributes deviceMessages = ClientDeviceMessageAttributes();
+  Map<String, dynamic> toJson() => _$DeviceInfoToJson(this);
+  factory DeviceInfo.fromJson(Map<String, dynamic> json) => _$DeviceInfoFromJson(json);
+  DeviceInfo();
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
 class DeviceList with ButtplugMessage {
-  List<DeviceAdded> devices = [];
+  List<DeviceInfo> devices = [];
   Map<String, dynamic> toJson() => _$DeviceListToJson(this);
   factory DeviceList.fromJson(Map<String, dynamic> json) => _$DeviceListFromJson(json);
   DeviceList();
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
-class DeviceAdded with ButtplugMessage {
-  int deviceIndex = 0;
-  String deviceName = "";
-  String? deviceDisplayName;
-  int? messageTimingGap;
-  ClientDeviceMessageAttributes deviceMessages = ClientDeviceMessageAttributes();
+class DeviceAdded extends DeviceInfo with ButtplugMessage {
   Map<String, dynamic> toJson() => _$DeviceAddedToJson(this);
   factory DeviceAdded.fromJson(Map<String, dynamic> json) => _$DeviceAddedFromJson(json);
   DeviceAdded();
@@ -174,19 +224,30 @@ class ButtplugServerMessage {
     if (deviceList != null) return deviceList!.id;
     if (deviceAdded != null) return deviceAdded!.id;
     if (deviceRemoved != null) return deviceRemoved!.id;
-    throw ButtplugMessageException("No id available");
+    throw ButtplugMessageException("No server message id available");
   }
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
-class ButtplugClientMessage {
+class ButtplugClientMessageUnion {
   RequestServerInfo? requestServerInfo;
   RequestDeviceList? requestDeviceList;
   Ping? ping;
+  StartScanning? startScanning;
+  StopScanning? stopScanning;
 
-  factory ButtplugClientMessage.fromJson(Map<String, dynamic> json) => _$ButtplugClientMessageFromJson(json);
+  factory ButtplugClientMessageUnion.fromJson(Map<String, dynamic> json) => _$ButtplugClientMessageUnionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ButtplugClientMessageToJson(this);
+  Map<String, dynamic> toJson() => _$ButtplugClientMessageUnionToJson(this);
 
-  ButtplugClientMessage();
+  ButtplugClientMessageUnion();
+
+  int get id {
+    if (requestDeviceList != null) return requestDeviceList!.id;
+    if (requestServerInfo != null) return requestServerInfo!.id;
+    if (ping != null) return ping!.id;
+    if (startScanning != null) return startScanning!.id;
+    if (stopScanning != null) return stopScanning!.id;
+    throw ButtplugMessageException("No client message id available");
+  }
 }
