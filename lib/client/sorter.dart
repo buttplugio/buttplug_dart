@@ -26,6 +26,7 @@ class MessageSorter {
     waitingFutures[messageCounter] = MessageCompletionFuture(responseStream.sink, Future(() async {
       return await responseCompleter.future;
     }));
+    messageCounter += 1;
   }
 
   Future<ButtplugServerMessage> waitForMessage(int id) async {
