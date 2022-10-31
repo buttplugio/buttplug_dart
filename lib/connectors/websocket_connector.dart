@@ -22,11 +22,9 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
       try {
         List<dynamic> msgs = jsonDecode(element);
         for (var msg in msgs) {
-          logInfo(msg);
           _serverMessageStream.add(ButtplugServerMessage.fromJson(msg));
         }
       } catch (e) {
-        logError(element);
         logError("Error adding message to stream: $e");
         await disconnect();
       }
