@@ -73,6 +73,10 @@ mixin ButtplugMessage {
   int id = 0;
 }
 
+mixin ButtplugDeviceMessage {
+  int deviceIndex = 0;
+}
+
 abstract class ButtplugClientMessage with ButtplugMessage {
   ButtplugClientMessageUnion asClientMessageUnion();
 }
@@ -147,6 +151,136 @@ class StopScanning with ButtplugMessage implements ButtplugClientMessage {
   }
 }
 
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class ScalarCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$ScalarCmdToJson(this);
+  factory ScalarCmd.fromJson(Map<String, dynamic> json) => _$ScalarCmdFromJson(json);
+  ScalarCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.scalarCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RotateCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$RotateCmdToJson(this);
+  factory RotateCmd.fromJson(Map<String, dynamic> json) => _$RotateCmdFromJson(json);
+  RotateCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.rotateCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class LinearCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$LinearCmdToJson(this);
+  factory LinearCmd.fromJson(Map<String, dynamic> json) => _$LinearCmdFromJson(json);
+  LinearCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.linearCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class SensorReadCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$SensorReadCmdToJson(this);
+  factory SensorReadCmd.fromJson(Map<String, dynamic> json) => _$SensorReadCmdFromJson(json);
+  SensorReadCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.sensorReadCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class SensorSubscribeCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$SensorSubscribeCmdToJson(this);
+  factory SensorSubscribeCmd.fromJson(Map<String, dynamic> json) => _$SensorSubscribeCmdFromJson(json);
+  SensorSubscribeCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.sensorSubscribeCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class SensorUnsubscribeCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$SensorUnsubscribeCmdToJson(this);
+  factory SensorUnsubscribeCmd.fromJson(Map<String, dynamic> json) => _$SensorUnsubscribeCmdFromJson(json);
+  SensorUnsubscribeCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.sensorUnsubscribeCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RawReadCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$RawReadCmdToJson(this);
+  factory RawReadCmd.fromJson(Map<String, dynamic> json) => _$RawReadCmdFromJson(json);
+  RawReadCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.rawReadCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RawWriteCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$RawWriteCmdToJson(this);
+  factory RawWriteCmd.fromJson(Map<String, dynamic> json) => _$RawWriteCmdFromJson(json);
+  RawWriteCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.rawWriteCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RawSubscribeCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$RawSubscribeCmdToJson(this);
+  factory RawSubscribeCmd.fromJson(Map<String, dynamic> json) => _$RawSubscribeCmdFromJson(json);
+  RawSubscribeCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.rawSubscribeCmd = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RawUnsubscribeCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$RawUnsubscribeCmdToJson(this);
+  factory RawUnsubscribeCmd.fromJson(Map<String, dynamic> json) => _$RawUnsubscribeCmdFromJson(json);
+  RawUnsubscribeCmd();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.rawUnsubscribeCmd = this;
+    return msg;
+  }
+}
+
 // Server Messages
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
@@ -154,6 +288,22 @@ class Ok with ButtplugMessage {
   Map<String, dynamic> toJson() => _$OkToJson(this);
   factory Ok.fromJson(Map<String, dynamic> json) => _$OkFromJson(json);
   Ok();
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class Error with ButtplugMessage {
+  int errorCode = 0;
+  String errorMessage = "";
+  Map<String, dynamic> toJson() => _$ErrorToJson(this);
+  factory Error.fromJson(Map<String, dynamic> json) => _$ErrorFromJson(json);
+  Error();
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class ScanningFinished with ButtplugMessage {
+  Map<String, dynamic> toJson() => _$ScanningFinishedToJson(this);
+  factory ScanningFinished.fromJson(Map<String, dynamic> json) => _$ScanningFinishedFromJson(json);
+  ScanningFinished();
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
@@ -202,6 +352,20 @@ class DeviceRemoved with ButtplugMessage {
   DeviceRemoved();
 }
 
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class SensorReading with ButtplugMessage, ButtplugDeviceMessage {
+  Map<String, dynamic> toJson() => _$SensorReadingToJson(this);
+  factory SensorReading.fromJson(Map<String, dynamic> json) => _$SensorReadingFromJson(json);
+  SensorReading();
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class RawReading with ButtplugMessage, ButtplugDeviceMessage {
+  Map<String, dynamic> toJson() => _$RawReadingToJson(this);
+  factory RawReading.fromJson(Map<String, dynamic> json) => _$RawReadingFromJson(json);
+  RawReading();
+}
+
 // Incoming/Outgoing Unions
 
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
@@ -211,6 +375,8 @@ class ButtplugServerMessage {
   DeviceList? deviceList;
   DeviceAdded? deviceAdded;
   DeviceRemoved? deviceRemoved;
+  SensorReading? sensorReading;
+  RawReading? rawReading;
 
   factory ButtplugServerMessage.fromJson(Map<String, dynamic> json) => _$ButtplugServerMessageFromJson(json);
 
@@ -235,6 +401,16 @@ class ButtplugClientMessageUnion {
   Ping? ping;
   StartScanning? startScanning;
   StopScanning? stopScanning;
+  ScalarCmd? scalarCmd;
+  RotateCmd? rotateCmd;
+  LinearCmd? linearCmd;
+  SensorReadCmd? sensorReadCmd;
+  SensorSubscribeCmd? sensorSubscribeCmd;
+  SensorUnsubscribeCmd? sensorUnsubscribeCmd;
+  RawReadCmd? rawReadCmd;
+  RawWriteCmd? rawWriteCmd;
+  RawSubscribeCmd? rawSubscribeCmd;
+  RawUnsubscribeCmd? rawUnsubscribeCmd;
 
   factory ButtplugClientMessageUnion.fromJson(Map<String, dynamic> json) => _$ButtplugClientMessageUnionFromJson(json);
 
@@ -248,6 +424,16 @@ class ButtplugClientMessageUnion {
     if (ping != null) return ping!.id;
     if (startScanning != null) return startScanning!.id;
     if (stopScanning != null) return stopScanning!.id;
+    if (scalarCmd != null) return scalarCmd!.id;
+    if (rotateCmd != null) return rotateCmd!.id;
+    if (linearCmd != null) return linearCmd!.id;
+    if (sensorReadCmd != null) return sensorReadCmd!.id;
+    if (sensorSubscribeCmd != null) return sensorSubscribeCmd!.id;
+    if (sensorUnsubscribeCmd != null) return sensorUnsubscribeCmd!.id;
+    if (rawReadCmd != null) return rawReadCmd!.id;
+    if (rawSubscribeCmd != null) return rawSubscribeCmd!.id;
+    if (rawUnsubscribeCmd != null) return rawUnsubscribeCmd!.id;
+    if (rawWriteCmd != null) return rawWriteCmd!.id;
     throw ButtplugMessageException("No client message id available");
   }
 }

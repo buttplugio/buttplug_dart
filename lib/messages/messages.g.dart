@@ -230,9 +230,132 @@ Map<String, dynamic> _$StopScanningToJson(StopScanning instance) =>
       'Id': instance.id,
     };
 
+ScalarCmd _$ScalarCmdFromJson(Map<String, dynamic> json) => ScalarCmd()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$ScalarCmdToJson(ScalarCmd instance) => <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RotateCmd _$RotateCmdFromJson(Map<String, dynamic> json) => RotateCmd()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RotateCmdToJson(RotateCmd instance) => <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+LinearCmd _$LinearCmdFromJson(Map<String, dynamic> json) => LinearCmd()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$LinearCmdToJson(LinearCmd instance) => <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+SensorReadCmd _$SensorReadCmdFromJson(Map<String, dynamic> json) =>
+    SensorReadCmd()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$SensorReadCmdToJson(SensorReadCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+SensorSubscribeCmd _$SensorSubscribeCmdFromJson(Map<String, dynamic> json) =>
+    SensorSubscribeCmd()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$SensorSubscribeCmdToJson(SensorSubscribeCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+SensorUnsubscribeCmd _$SensorUnsubscribeCmdFromJson(
+        Map<String, dynamic> json) =>
+    SensorUnsubscribeCmd()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$SensorUnsubscribeCmdToJson(
+        SensorUnsubscribeCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RawReadCmd _$RawReadCmdFromJson(Map<String, dynamic> json) => RawReadCmd()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RawReadCmdToJson(RawReadCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RawWriteCmd _$RawWriteCmdFromJson(Map<String, dynamic> json) => RawWriteCmd()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RawWriteCmdToJson(RawWriteCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RawSubscribeCmd _$RawSubscribeCmdFromJson(Map<String, dynamic> json) =>
+    RawSubscribeCmd()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RawSubscribeCmdToJson(RawSubscribeCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RawUnsubscribeCmd _$RawUnsubscribeCmdFromJson(Map<String, dynamic> json) =>
+    RawUnsubscribeCmd()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RawUnsubscribeCmdToJson(RawUnsubscribeCmd instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
 Ok _$OkFromJson(Map<String, dynamic> json) => Ok()..id = json['Id'] as int;
 
 Map<String, dynamic> _$OkToJson(Ok instance) => <String, dynamic>{
+      'Id': instance.id,
+    };
+
+Error _$ErrorFromJson(Map<String, dynamic> json) => Error()
+  ..id = json['Id'] as int
+  ..errorCode = json['ErrorCode'] as int
+  ..errorMessage = json['ErrorMessage'] as String;
+
+Map<String, dynamic> _$ErrorToJson(Error instance) => <String, dynamic>{
+      'Id': instance.id,
+      'ErrorCode': instance.errorCode,
+      'ErrorMessage': instance.errorMessage,
+    };
+
+ScanningFinished _$ScanningFinishedFromJson(Map<String, dynamic> json) =>
+    ScanningFinished()..id = json['Id'] as int;
+
+Map<String, dynamic> _$ScanningFinishedToJson(ScanningFinished instance) =>
+    <String, dynamic>{
       'Id': instance.id,
     };
 
@@ -318,6 +441,27 @@ Map<String, dynamic> _$DeviceRemovedToJson(DeviceRemoved instance) =>
       'DeviceIndex': instance.deviceIndex,
     };
 
+SensorReading _$SensorReadingFromJson(Map<String, dynamic> json) =>
+    SensorReading()
+      ..id = json['Id'] as int
+      ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$SensorReadingToJson(SensorReading instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
+RawReading _$RawReadingFromJson(Map<String, dynamic> json) => RawReading()
+  ..id = json['Id'] as int
+  ..deviceIndex = json['DeviceIndex'] as int;
+
+Map<String, dynamic> _$RawReadingToJson(RawReading instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+      'DeviceIndex': instance.deviceIndex,
+    };
+
 ButtplugServerMessage _$ButtplugServerMessageFromJson(
         Map<String, dynamic> json) =>
     ButtplugServerMessage()
@@ -336,7 +480,14 @@ ButtplugServerMessage _$ButtplugServerMessageFromJson(
       ..deviceRemoved = json['DeviceRemoved'] == null
           ? null
           : DeviceRemoved.fromJson(
-              json['DeviceRemoved'] as Map<String, dynamic>);
+              json['DeviceRemoved'] as Map<String, dynamic>)
+      ..sensorReading = json['SensorReading'] == null
+          ? null
+          : SensorReading.fromJson(
+              json['SensorReading'] as Map<String, dynamic>)
+      ..rawReading = json['RawReading'] == null
+          ? null
+          : RawReading.fromJson(json['RawReading'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ButtplugServerMessageToJson(
     ButtplugServerMessage instance) {
@@ -353,6 +504,8 @@ Map<String, dynamic> _$ButtplugServerMessageToJson(
   writeNotNull('DeviceList', instance.deviceList);
   writeNotNull('DeviceAdded', instance.deviceAdded);
   writeNotNull('DeviceRemoved', instance.deviceRemoved);
+  writeNotNull('SensorReading', instance.sensorReading);
+  writeNotNull('RawReading', instance.rawReading);
   return val;
 }
 
@@ -376,7 +529,42 @@ ButtplugClientMessageUnion _$ButtplugClientMessageUnionFromJson(
               json['StartScanning'] as Map<String, dynamic>)
       ..stopScanning = json['StopScanning'] == null
           ? null
-          : StopScanning.fromJson(json['StopScanning'] as Map<String, dynamic>);
+          : StopScanning.fromJson(json['StopScanning'] as Map<String, dynamic>)
+      ..scalarCmd = json['ScalarCmd'] == null
+          ? null
+          : ScalarCmd.fromJson(json['ScalarCmd'] as Map<String, dynamic>)
+      ..rotateCmd = json['RotateCmd'] == null
+          ? null
+          : RotateCmd.fromJson(json['RotateCmd'] as Map<String, dynamic>)
+      ..linearCmd = json['LinearCmd'] == null
+          ? null
+          : LinearCmd.fromJson(json['LinearCmd'] as Map<String, dynamic>)
+      ..sensorReadCmd = json['SensorReadCmd'] == null
+          ? null
+          : SensorReadCmd.fromJson(
+              json['SensorReadCmd'] as Map<String, dynamic>)
+      ..sensorSubscribeCmd = json['SensorSubscribeCmd'] == null
+          ? null
+          : SensorSubscribeCmd.fromJson(
+              json['SensorSubscribeCmd'] as Map<String, dynamic>)
+      ..sensorUnsubscribeCmd = json['SensorUnsubscribeCmd'] == null
+          ? null
+          : SensorUnsubscribeCmd.fromJson(
+              json['SensorUnsubscribeCmd'] as Map<String, dynamic>)
+      ..rawReadCmd = json['RawReadCmd'] == null
+          ? null
+          : RawReadCmd.fromJson(json['RawReadCmd'] as Map<String, dynamic>)
+      ..rawWriteCmd = json['RawWriteCmd'] == null
+          ? null
+          : RawWriteCmd.fromJson(json['RawWriteCmd'] as Map<String, dynamic>)
+      ..rawSubscribeCmd = json['RawSubscribeCmd'] == null
+          ? null
+          : RawSubscribeCmd.fromJson(
+              json['RawSubscribeCmd'] as Map<String, dynamic>)
+      ..rawUnsubscribeCmd = json['RawUnsubscribeCmd'] == null
+          ? null
+          : RawUnsubscribeCmd.fromJson(
+              json['RawUnsubscribeCmd'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ButtplugClientMessageUnionToJson(
     ButtplugClientMessageUnion instance) {
@@ -393,5 +581,15 @@ Map<String, dynamic> _$ButtplugClientMessageUnionToJson(
   writeNotNull('Ping', instance.ping);
   writeNotNull('StartScanning', instance.startScanning);
   writeNotNull('StopScanning', instance.stopScanning);
+  writeNotNull('ScalarCmd', instance.scalarCmd);
+  writeNotNull('RotateCmd', instance.rotateCmd);
+  writeNotNull('LinearCmd', instance.linearCmd);
+  writeNotNull('SensorReadCmd', instance.sensorReadCmd);
+  writeNotNull('SensorSubscribeCmd', instance.sensorSubscribeCmd);
+  writeNotNull('SensorUnsubscribeCmd', instance.sensorUnsubscribeCmd);
+  writeNotNull('RawReadCmd', instance.rawReadCmd);
+  writeNotNull('RawWriteCmd', instance.rawWriteCmd);
+  writeNotNull('RawSubscribeCmd', instance.rawSubscribeCmd);
+  writeNotNull('RawUnsubscribeCmd', instance.rawUnsubscribeCmd);
   return val;
 }
