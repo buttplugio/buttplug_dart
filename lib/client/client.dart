@@ -26,6 +26,10 @@ class ButtplugClient {
     await _runHandshake();
   }
 
+  bool connected() {
+    return true;
+  }
+
   Future<void> disconnect() async {
     await _connector!.disconnect();
   }
@@ -52,14 +56,18 @@ class ButtplugClient {
     }
     var deviceList = deviceListWrapper.deviceList!;
     for (var device in deviceList.devices) {
-      devices[device.deviceIndex] = ButtplugClientDevice(device);
+      devices[device.deviceIndex] = ButtplugClientDevice(device, _sendMessageExpectReply);
     }
   }
 
-  Future<void> _sendMessageExpectOk(ButtplugClientMessage message) async {
+  Future<ButtplugServerMessage> _sendMessageExpectReply(ButtplugClientMessage message) async {
     _sorter.prepareMessage(message);
     _connector!.send(message.asClientMessageUnion());
-    ButtplugServerMessage okWrapper = await _sorter.waitForMessage(message.id);
+    return await _sorter.waitForMessage(message.id);
+  }
+
+  Future<void> _sendMessageExpectOk(ButtplugClientMessage message) async {
+    ButtplugServerMessage okWrapper = await _sendMessageExpectReply(message);
     if (okWrapper.ok == null) {
       throw ButtplugClientException("Did not receive DeviceList message back from server on handshake.");
     }
@@ -71,6 +79,10 @@ class ButtplugClient {
 
   Future<void> stopScanning() async {
     await _sendMessageExpectOk(StopScanning());
+  }
+
+  Future<void> stopAllDevices() async {
+    await _sendMessageExpectOk(StopAllDevices());
   }
 
   Future<void> _parseMessage() async {}

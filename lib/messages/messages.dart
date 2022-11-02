@@ -152,7 +152,31 @@ class StopScanning with ButtplugMessage implements ButtplugClientMessage {
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
+class StopAllDevices with ButtplugMessage implements ButtplugClientMessage {
+  Map<String, dynamic> toJson() => _$StopAllDevicesToJson(this);
+  factory StopAllDevices.fromJson(Map<String, dynamic> json) => _$StopAllDevicesFromJson(json);
+  StopAllDevices();
+  @override
+  ButtplugClientMessageUnion asClientMessageUnion() {
+    var msg = ButtplugClientMessageUnion();
+    msg.stopAllDevices = this;
+    return msg;
+  }
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
+class ScalarSubcommand {
+  int index = 0;
+  double scalar = 0;
+  ActuatorType actuatorType = ActuatorType.Vibrate;
+  Map<String, dynamic> toJson() => _$ScalarSubcommandToJson(this);
+  factory ScalarSubcommand.fromJson(Map<String, dynamic> json) => _$ScalarSubcommandFromJson(json);
+  ScalarSubcommand(this.index, this.scalar, this.actuatorType);
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
 class ScalarCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  List<ScalarSubcommand> scalars = [];
   Map<String, dynamic> toJson() => _$ScalarCmdToJson(this);
   factory ScalarCmd.fromJson(Map<String, dynamic> json) => _$ScalarCmdFromJson(json);
   ScalarCmd();
@@ -165,7 +189,18 @@ class ScalarCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugC
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
+class RotateSubcommand {
+  int index = 0;
+  double speed = 0;
+  bool clockwise = false;
+  Map<String, dynamic> toJson() => _$RotateSubcommandToJson(this);
+  factory RotateSubcommand.fromJson(Map<String, dynamic> json) => _$RotateSubcommandFromJson(json);
+  RotateSubcommand(this.index, this.speed, this.clockwise);
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
 class RotateCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  List<RotateSubcommand> rotations = [];
   Map<String, dynamic> toJson() => _$RotateCmdToJson(this);
   factory RotateCmd.fromJson(Map<String, dynamic> json) => _$RotateCmdFromJson(json);
   RotateCmd();
@@ -178,7 +213,18 @@ class RotateCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugC
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
+class LinearSubcommand {
+  int index = 0;
+  double position = 0;
+  int duration = 0;
+  Map<String, dynamic> toJson() => _$LinearSubcommandToJson(this);
+  factory LinearSubcommand.fromJson(Map<String, dynamic> json) => _$LinearSubcommandFromJson(json);
+  LinearSubcommand(this.index, this.position, this.duration);
+}
+
+@JsonSerializable(fieldRename: FieldRename.pascal)
 class LinearCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  List<LinearSubcommand> vectors = [];
   Map<String, dynamic> toJson() => _$LinearCmdToJson(this);
   factory LinearCmd.fromJson(Map<String, dynamic> json) => _$LinearCmdFromJson(json);
   LinearCmd();
@@ -401,6 +447,7 @@ class ButtplugClientMessageUnion {
   Ping? ping;
   StartScanning? startScanning;
   StopScanning? stopScanning;
+  StopAllDevices? stopAllDevices;
   ScalarCmd? scalarCmd;
   RotateCmd? rotateCmd;
   LinearCmd? linearCmd;
@@ -424,6 +471,7 @@ class ButtplugClientMessageUnion {
     if (ping != null) return ping!.id;
     if (startScanning != null) return startScanning!.id;
     if (stopScanning != null) return stopScanning!.id;
+    if (stopAllDevices != null) return stopAllDevices!.id;
     if (scalarCmd != null) return scalarCmd!.id;
     if (rotateCmd != null) return rotateCmd!.id;
     if (linearCmd != null) return linearCmd!.id;

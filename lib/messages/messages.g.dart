@@ -230,31 +230,93 @@ Map<String, dynamic> _$StopScanningToJson(StopScanning instance) =>
       'Id': instance.id,
     };
 
+StopAllDevices _$StopAllDevicesFromJson(Map<String, dynamic> json) =>
+    StopAllDevices()..id = json['Id'] as int;
+
+Map<String, dynamic> _$StopAllDevicesToJson(StopAllDevices instance) =>
+    <String, dynamic>{
+      'Id': instance.id,
+    };
+
+ScalarSubcommand _$ScalarSubcommandFromJson(Map<String, dynamic> json) =>
+    ScalarSubcommand(
+      json['Index'] as int,
+      (json['Scalar'] as num).toDouble(),
+      $enumDecode(_$ActuatorTypeEnumMap, json['ActuatorType']),
+    );
+
+Map<String, dynamic> _$ScalarSubcommandToJson(ScalarSubcommand instance) =>
+    <String, dynamic>{
+      'Index': instance.index,
+      'Scalar': instance.scalar,
+      'ActuatorType': _$ActuatorTypeEnumMap[instance.actuatorType]!,
+    };
+
 ScalarCmd _$ScalarCmdFromJson(Map<String, dynamic> json) => ScalarCmd()
   ..id = json['Id'] as int
-  ..deviceIndex = json['DeviceIndex'] as int;
+  ..deviceIndex = json['DeviceIndex'] as int
+  ..scalars = (json['Scalars'] as List<dynamic>)
+      .map((e) => ScalarSubcommand.fromJson(e as Map<String, dynamic>))
+      .toList();
 
 Map<String, dynamic> _$ScalarCmdToJson(ScalarCmd instance) => <String, dynamic>{
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
+      'Scalars': instance.scalars,
+    };
+
+RotateSubcommand _$RotateSubcommandFromJson(Map<String, dynamic> json) =>
+    RotateSubcommand(
+      json['Index'] as int,
+      (json['Speed'] as num).toDouble(),
+      json['Clockwise'] as bool,
+    );
+
+Map<String, dynamic> _$RotateSubcommandToJson(RotateSubcommand instance) =>
+    <String, dynamic>{
+      'Index': instance.index,
+      'Speed': instance.speed,
+      'Clockwise': instance.clockwise,
     };
 
 RotateCmd _$RotateCmdFromJson(Map<String, dynamic> json) => RotateCmd()
   ..id = json['Id'] as int
-  ..deviceIndex = json['DeviceIndex'] as int;
+  ..deviceIndex = json['DeviceIndex'] as int
+  ..rotations = (json['Rotations'] as List<dynamic>)
+      .map((e) => RotateSubcommand.fromJson(e as Map<String, dynamic>))
+      .toList();
 
 Map<String, dynamic> _$RotateCmdToJson(RotateCmd instance) => <String, dynamic>{
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
+      'Rotations': instance.rotations,
+    };
+
+LinearSubcommand _$LinearSubcommandFromJson(Map<String, dynamic> json) =>
+    LinearSubcommand(
+      json['Index'] as int,
+      (json['Position'] as num).toDouble(),
+      json['Duration'] as int,
+    );
+
+Map<String, dynamic> _$LinearSubcommandToJson(LinearSubcommand instance) =>
+    <String, dynamic>{
+      'Index': instance.index,
+      'Position': instance.position,
+      'Duration': instance.duration,
     };
 
 LinearCmd _$LinearCmdFromJson(Map<String, dynamic> json) => LinearCmd()
   ..id = json['Id'] as int
-  ..deviceIndex = json['DeviceIndex'] as int;
+  ..deviceIndex = json['DeviceIndex'] as int
+  ..vectors = (json['Vectors'] as List<dynamic>)
+      .map((e) => LinearSubcommand.fromJson(e as Map<String, dynamic>))
+      .toList();
 
 Map<String, dynamic> _$LinearCmdToJson(LinearCmd instance) => <String, dynamic>{
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
+      'Vectors': instance.vectors,
     };
 
 SensorReadCmd _$SensorReadCmdFromJson(Map<String, dynamic> json) =>
@@ -530,6 +592,10 @@ ButtplugClientMessageUnion _$ButtplugClientMessageUnionFromJson(
       ..stopScanning = json['StopScanning'] == null
           ? null
           : StopScanning.fromJson(json['StopScanning'] as Map<String, dynamic>)
+      ..stopAllDevices = json['StopAllDevices'] == null
+          ? null
+          : StopAllDevices.fromJson(
+              json['StopAllDevices'] as Map<String, dynamic>)
       ..scalarCmd = json['ScalarCmd'] == null
           ? null
           : ScalarCmd.fromJson(json['ScalarCmd'] as Map<String, dynamic>)
@@ -581,6 +647,7 @@ Map<String, dynamic> _$ButtplugClientMessageUnionToJson(
   writeNotNull('Ping', instance.ping);
   writeNotNull('StartScanning', instance.startScanning);
   writeNotNull('StopScanning', instance.stopScanning);
+  writeNotNull('StopAllDevices', instance.stopAllDevices);
   writeNotNull('ScalarCmd', instance.scalarCmd);
   writeNotNull('RotateCmd', instance.rotateCmd);
   writeNotNull('LinearCmd', instance.linearCmd);
