@@ -25,7 +25,7 @@ class ClientGenericDeviceMessageAttributes {
 class SensorDeviceMessageAttributes {
   String featureDescriptor = "";
   SensorType sensorType = SensorType.Pressure;
-  List<int> stepCount = [0];
+  List<List<int>> sensorRange = [];
 
   Map<String, dynamic> toJson() => _$SensorDeviceMessageAttributesToJson(this);
   factory SensorDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>

@@ -36,15 +36,16 @@ SensorDeviceMessageAttributes _$SensorDeviceMessageAttributesFromJson(
     SensorDeviceMessageAttributes()
       ..featureDescriptor = json['FeatureDescriptor'] as String
       ..sensorType = $enumDecode(_$SensorTypeEnumMap, json['SensorType'])
-      ..stepCount =
-          (json['StepCount'] as List<dynamic>).map((e) => e as int).toList();
+      ..sensorRange = (json['SensorRange'] as List<dynamic>)
+          .map((e) => (e as List<dynamic>).map((e) => e as int).toList())
+          .toList();
 
 Map<String, dynamic> _$SensorDeviceMessageAttributesToJson(
         SensorDeviceMessageAttributes instance) =>
     <String, dynamic>{
       'FeatureDescriptor': instance.featureDescriptor,
       'SensorType': _$SensorTypeEnumMap[instance.sensorType]!,
-      'StepCount': instance.stepCount,
+      'SensorRange': instance.sensorRange,
     };
 
 const _$SensorTypeEnumMap = {
