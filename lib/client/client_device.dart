@@ -44,13 +44,13 @@ class ButtplugDeviceCommand<T> {
   }
 }
 
-class VibrateComponents {
+class VibrateComponent {
   double speed;
 
-  VibrateComponents(this.speed);
+  VibrateComponent(this.speed);
 }
 
-typedef VibrateCommand = ButtplugDeviceCommand<VibrateComponents>;
+typedef VibrateCommand = ButtplugDeviceCommand<VibrateComponent>;
 
 class ScalarComponent {
   double scalar;
