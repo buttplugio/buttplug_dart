@@ -37,7 +37,7 @@ class ButtplugClient {
       }
       if (message.deviceAdded != null) {
         var device = ButtplugClientDevice(message.deviceAdded!, (msg) => _sendMessageExpectReply(msg));
-        _devices[device.deviceIndex] = device;
+        _devices[device.index] = device;
         _eventStream.add(DeviceAddedEvent(device));
       }
     });

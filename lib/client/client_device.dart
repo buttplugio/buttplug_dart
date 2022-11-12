@@ -80,17 +80,17 @@ class LinearComponent {
 typedef LinearCommand = ButtplugDeviceCommand<LinearComponent>;
 
 class ButtplugClientDevice {
-  late final int deviceIndex;
-  late final String deviceName;
-  late final String? deviceDisplayName;
+  late final int index;
+  late final String name;
+  late final String? displayName;
   late final int? _messageTimingGap;
   late final ClientDeviceMessageAttributes messageAttributes;
   Function(ButtplugClientMessage msg) msgClosure;
 
   ButtplugClientDevice(DeviceInfo deviceInfo, this.msgClosure) {
-    deviceIndex = deviceInfo.deviceIndex;
-    deviceName = deviceInfo.deviceName;
-    deviceDisplayName = deviceInfo.deviceDisplayName;
+    index = deviceInfo.deviceIndex;
+    name = deviceInfo.deviceName;
+    displayName = deviceInfo.deviceDisplayName;
     _messageTimingGap = deviceInfo.messageTimingGap;
     messageAttributes = deviceInfo.deviceMessages;
   }
@@ -109,7 +109,7 @@ class ButtplugClientDevice {
   Future<void> vibrate(VibrateCommand command) async {
     if (messageAttributes.scalarCmd == null ||
         !messageAttributes.scalarCmd!.any((element) => element.actuatorType == ActuatorType.Vibrate)) {
-      throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support vibration commands");
+      throw ButtplugClientDeviceException("$name ($displayName) does not support vibration commands");
     }
     // Rebuild vibration command as scalar command
     var vibeCount =
@@ -123,10 +123,10 @@ class ButtplugClientDevice {
 
   Future<void> scalar(ScalarCommand command) async {
     if (messageAttributes.scalarCmd == null) {
-      throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support scalar commands");
+      throw ButtplugClientDeviceException("$name ($displayName) does not support scalar commands");
     }
     var scalarMsg = ScalarCmd();
-    scalarMsg.deviceIndex = deviceIndex;
+    scalarMsg.deviceIndex = index;
     var subcommandList = <ScalarSubcommand>[];
     command.asMap(messageAttributes.scalarCmd!.length).forEach((key, value) {
       subcommandList.add(ScalarSubcommand(key, value.scalar, value.actuator));
@@ -137,10 +137,10 @@ class ButtplugClientDevice {
 
   Future<void> rotate(RotateCommand command) async {
     if (messageAttributes.rotateCmd == null) {
-      throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support rotate commands");
+      throw ButtplugClientDeviceException("$name ($displayName) does not support rotate commands");
     }
     var rotateMsg = RotateCmd();
-    rotateMsg.deviceIndex = deviceIndex;
+    rotateMsg.deviceIndex = index;
     var subcommandList = <RotateSubcommand>[];
     command.asMap(messageAttributes.rotateCmd!.length).forEach((key, value) {
       subcommandList.add(RotateSubcommand(key, value.speed, value.clockwise));
@@ -151,10 +151,10 @@ class ButtplugClientDevice {
 
   Future<void> linear(LinearCommand command) async {
     if (messageAttributes.linearCmd == null) {
-      throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support linear commands");
+      throw ButtplugClientDeviceException("$name ($displayName) does not support linear commands");
     }
     var linearMsg = LinearCmd();
-    linearMsg.deviceIndex = deviceIndex;
+    linearMsg.deviceIndex = index;
     var subcommandList = <LinearSubcommand>[];
     command.asMap(messageAttributes.rotateCmd!.length).forEach((key, value) {
       subcommandList.add(LinearSubcommand(key, value.position, value.duration));

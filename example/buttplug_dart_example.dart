@@ -20,7 +20,7 @@ void main() async {
   await Future.delayed(Duration(seconds: 10));
   logInfo("Devices:");
   for (var device in client.devices.values) {
-    logInfo("- ${device.deviceName}");
+    logInfo("- ${device.name}");
   }
   await client.disconnect();
   logInfo("Server disconnected");
