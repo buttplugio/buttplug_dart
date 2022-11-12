@@ -4,6 +4,7 @@
 library buttplug_dart;
 
 export "package:buttplug/client/client.dart";
+export "package:buttplug/client/client_device.dart";
 export "package:buttplug/messages/messages.dart";
 export "package:buttplug/messages/enums.dart";
 export "package:buttplug/connectors/connector.dart";

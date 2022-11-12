@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:buttplug/client/client_device.dart';
 import 'package:buttplug/client/sorter.dart';
 import 'package:buttplug/connectors/connector.dart';
@@ -8,19 +10,36 @@ class ButtplugClientException implements Exception {
   ButtplugClientException(this.message);
 }
 
+class ButtplugClientEvent {}
+
+class DeviceAddedEvent extends ButtplugClientEvent {
+  final ButtplugClientDevice device;
+
+  DeviceAddedEvent(this.device);
+}
+
 class ButtplugClient {
   final String name;
   String? _serverName;
+  StreamController<ButtplugClientEvent> _eventStream = StreamController();
   ButtplugClientConnector? _connector;
   final MessageSorter _sorter = MessageSorter();
-  final Map<int, ButtplugClientDevice> devices = {};
+  final Map<int, ButtplugClientDevice> _devices = {};
 
   ButtplugClient(this.name);
 
   Future<void> connect(ButtplugClientConnector connector) async {
     _connector = connector;
     _connector!.messageStream.listen((message) {
-      if (message.id != 0) _sorter.checkMessage(message);
+      if (message.id != 0) {
+        _sorter.checkMessage(message);
+        return;
+      }
+      if (message.deviceAdded != null) {
+        var device = ButtplugClientDevice(message.deviceAdded!, (msg) => _sendMessageExpectReply(msg));
+        _devices[device.deviceIndex] = device;
+        _eventStream.add(DeviceAddedEvent(device));
+      }
     });
     await _connector!.connect();
     await _runHandshake();
@@ -56,7 +75,7 @@ class ButtplugClient {
     }
     var deviceList = deviceListWrapper.deviceList!;
     for (var device in deviceList.devices) {
-      devices[device.deviceIndex] = ButtplugClientDevice(device, _sendMessageExpectReply);
+      _devices[device.deviceIndex] = ButtplugClientDevice(device, _sendMessageExpectReply);
     }
   }
 
@@ -88,4 +107,6 @@ class ButtplugClient {
   Future<void> _parseMessage() async {}
 
   String? get serverName => _serverName;
+  Map<int, ButtplugClientDevice> get devices => _devices;
+  Stream<ButtplugClientEvent> get eventStream => _eventStream.stream;
 }

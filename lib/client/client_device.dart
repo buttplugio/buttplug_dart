@@ -80,7 +80,7 @@ class LinearComponent {
 typedef LinearCommand = ButtplugDeviceCommand<LinearComponent>;
 
 class ButtplugClientDevice {
-  late final int _deviceIndex;
+  late final int deviceIndex;
   late final String deviceName;
   late final String? deviceDisplayName;
   late final int? _messageTimingGap;
@@ -88,7 +88,7 @@ class ButtplugClientDevice {
   Function(ButtplugClientMessage msg) msgClosure;
 
   ButtplugClientDevice(DeviceInfo deviceInfo, this.msgClosure) {
-    _deviceIndex = deviceInfo.deviceIndex;
+    deviceIndex = deviceInfo.deviceIndex;
     deviceName = deviceInfo.deviceName;
     deviceDisplayName = deviceInfo.deviceDisplayName;
     _messageTimingGap = deviceInfo.messageTimingGap;
@@ -126,7 +126,7 @@ class ButtplugClientDevice {
       throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support scalar commands");
     }
     var scalarMsg = ScalarCmd();
-    scalarMsg.deviceIndex = _deviceIndex;
+    scalarMsg.deviceIndex = deviceIndex;
     var subcommandList = <ScalarSubcommand>[];
     command.asMap(messageAttributes.scalarCmd!.length).forEach((key, value) {
       subcommandList.add(ScalarSubcommand(key, value.scalar, value.actuator));
@@ -140,7 +140,7 @@ class ButtplugClientDevice {
       throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support rotate commands");
     }
     var rotateMsg = RotateCmd();
-    rotateMsg.deviceIndex = _deviceIndex;
+    rotateMsg.deviceIndex = deviceIndex;
     var subcommandList = <RotateSubcommand>[];
     command.asMap(messageAttributes.rotateCmd!.length).forEach((key, value) {
       subcommandList.add(RotateSubcommand(key, value.speed, value.clockwise));
@@ -154,7 +154,7 @@ class ButtplugClientDevice {
       throw ButtplugClientDeviceException("$deviceName ($deviceDisplayName) does not support linear commands");
     }
     var linearMsg = LinearCmd();
-    linearMsg.deviceIndex = _deviceIndex;
+    linearMsg.deviceIndex = deviceIndex;
     var subcommandList = <LinearSubcommand>[];
     command.asMap(messageAttributes.rotateCmd!.length).forEach((key, value) {
       subcommandList.add(LinearSubcommand(key, value.position, value.duration));
