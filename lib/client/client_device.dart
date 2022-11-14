@@ -160,7 +160,7 @@ class ButtplugClientDevice {
     var linearMsg = LinearCmd();
     linearMsg.deviceIndex = index;
     var subcommandList = <LinearSubcommand>[];
-    command.asMap(messageAttributes.rotateCmd!.length).forEach((key, value) {
+    command.asMap(messageAttributes.linearCmd!.length).forEach((key, value) {
       subcommandList.add(LinearSubcommand(key, value.position, value.duration));
     });
     linearMsg.vectors = subcommandList;
