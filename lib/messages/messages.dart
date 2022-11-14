@@ -238,6 +238,8 @@ class LinearCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugC
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class SensorReadCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  int sensorIndex = 0;
+  SensorType sensorType = SensorType.Battery;
   Map<String, dynamic> toJson() => _$SensorReadCmdToJson(this);
   factory SensorReadCmd.fromJson(Map<String, dynamic> json) => _$SensorReadCmdFromJson(json);
   SensorReadCmd();
@@ -400,6 +402,9 @@ class DeviceRemoved with ButtplugMessage {
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class SensorReading with ButtplugMessage, ButtplugDeviceMessage {
+  int sensorIndex = 0;
+  SensorType sensorType = SensorType.Battery;
+  List<int> data = [];
   Map<String, dynamic> toJson() => _$SensorReadingToJson(this);
   factory SensorReading.fromJson(Map<String, dynamic> json) => _$SensorReadingFromJson(json);
   SensorReading();
@@ -417,6 +422,7 @@ class RawReading with ButtplugMessage, ButtplugDeviceMessage {
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
 class ButtplugServerMessage {
   Ok? ok;
+  Error? error;
   ServerInfo? serverInfo;
   DeviceList? deviceList;
   DeviceAdded? deviceAdded;
@@ -432,10 +438,13 @@ class ButtplugServerMessage {
 
   int get id {
     if (ok != null) return ok!.id;
+    if (error != null) return error!.id;
     if (serverInfo != null) return serverInfo!.id;
     if (deviceList != null) return deviceList!.id;
     if (deviceAdded != null) return deviceAdded!.id;
     if (deviceRemoved != null) return deviceRemoved!.id;
+    if (sensorReading != null) return sensorReading!.id;
+    if (rawReading != null) return rawReading!.id;
     throw ButtplugMessageException("No server message id available");
   }
 }

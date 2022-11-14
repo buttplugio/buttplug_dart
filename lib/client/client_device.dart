@@ -102,6 +102,10 @@ class ButtplugClientDevice {
     }
   }
 
+  Future<ButtplugServerMessage> _sendMessageExpectReturn(ButtplugClientMessage message) async {
+    return await msgClosure(message);
+  }
+
   bool connected() {
     return true;
   }
@@ -161,5 +165,23 @@ class ButtplugClientDevice {
     });
     linearMsg.vectors = subcommandList;
     return await _sendMessageExpectOk(linearMsg);
+  }
+
+  Future<List<int>> sensorRead(int sensorIndex) async {
+    if (messageAttributes.sensorReadCmd == null) {
+      throw ButtplugClientDeviceException("$name ($displayName) does not support sensor read commands");
+    }
+    var sensorReadMsg = SensorReadCmd();
+    sensorReadMsg.deviceIndex = index;
+    if (messageAttributes.sensorReadCmd!.length < sensorIndex) {
+      throw ButtplugClientDeviceException("$name ($displayName) does not have a sensor read index of $sensorIndex");
+    }
+    sensorReadMsg.sensorIndex = sensorIndex;
+    sensorReadMsg.sensorType = messageAttributes.sensorReadCmd![sensorIndex].sensorType;
+    ButtplugServerMessage returnMsg = await _sendMessageExpectReturn(sensorReadMsg);
+    if (returnMsg.sensorReading == null) {
+      throw ButtplugClientDeviceException("Did not receive SensorReading back from SensorRead transaction");
+    }
+    return returnMsg.sensorReading!.data;
   }
 }

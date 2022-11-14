@@ -323,12 +323,16 @@ Map<String, dynamic> _$LinearCmdToJson(LinearCmd instance) => <String, dynamic>{
 SensorReadCmd _$SensorReadCmdFromJson(Map<String, dynamic> json) =>
     SensorReadCmd()
       ..id = json['Id'] as int
-      ..deviceIndex = json['DeviceIndex'] as int;
+      ..deviceIndex = json['DeviceIndex'] as int
+      ..sensorIndex = json['SensorIndex'] as int
+      ..sensorType = $enumDecode(_$SensorTypeEnumMap, json['SensorType']);
 
 Map<String, dynamic> _$SensorReadCmdToJson(SensorReadCmd instance) =>
     <String, dynamic>{
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
+      'SensorIndex': instance.sensorIndex,
+      'SensorType': _$SensorTypeEnumMap[instance.sensorType]!,
     };
 
 SensorSubscribeCmd _$SensorSubscribeCmdFromJson(Map<String, dynamic> json) =>
@@ -507,12 +511,18 @@ Map<String, dynamic> _$DeviceRemovedToJson(DeviceRemoved instance) =>
 SensorReading _$SensorReadingFromJson(Map<String, dynamic> json) =>
     SensorReading()
       ..id = json['Id'] as int
-      ..deviceIndex = json['DeviceIndex'] as int;
+      ..deviceIndex = json['DeviceIndex'] as int
+      ..sensorIndex = json['SensorIndex'] as int
+      ..sensorType = $enumDecode(_$SensorTypeEnumMap, json['SensorType'])
+      ..data = (json['Data'] as List<dynamic>).map((e) => e as int).toList();
 
 Map<String, dynamic> _$SensorReadingToJson(SensorReading instance) =>
     <String, dynamic>{
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
+      'SensorIndex': instance.sensorIndex,
+      'SensorType': _$SensorTypeEnumMap[instance.sensorType]!,
+      'Data': instance.data,
     };
 
 RawReading _$RawReadingFromJson(Map<String, dynamic> json) => RawReading()
@@ -531,6 +541,9 @@ ButtplugServerMessage _$ButtplugServerMessageFromJson(
       ..ok = json['Ok'] == null
           ? null
           : Ok.fromJson(json['Ok'] as Map<String, dynamic>)
+      ..error = json['Error'] == null
+          ? null
+          : Error.fromJson(json['Error'] as Map<String, dynamic>)
       ..serverInfo = json['ServerInfo'] == null
           ? null
           : ServerInfo.fromJson(json['ServerInfo'] as Map<String, dynamic>)
@@ -563,6 +576,7 @@ Map<String, dynamic> _$ButtplugServerMessageToJson(
   }
 
   writeNotNull('Ok', instance.ok);
+  writeNotNull('Error', instance.error);
   writeNotNull('ServerInfo', instance.serverInfo);
   writeNotNull('DeviceList', instance.deviceList);
   writeNotNull('DeviceAdded', instance.deviceAdded);
