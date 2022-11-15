@@ -18,6 +18,12 @@ class DeviceAddedEvent extends ButtplugClientEvent {
   DeviceAddedEvent(this.device);
 }
 
+class DeviceRemovedEvent extends ButtplugClientEvent {
+  final ButtplugClientDevice device;
+
+  DeviceRemovedEvent(this.device);
+}
+
 class ButtplugClient {
   final String name;
   String? _serverName;
@@ -39,6 +45,11 @@ class ButtplugClient {
         var device = ButtplugClientDevice(message.deviceAdded!, (msg) => _sendMessageExpectReply(msg));
         _devices[device.index] = device;
         _eventStream.add(DeviceAddedEvent(device));
+      }
+      if (message.deviceRemoved != null) {
+        var device = _devices[message.deviceRemoved!.deviceIndex]!;
+        _devices.remove(message.deviceRemoved!.deviceIndex);
+        _eventStream.add(DeviceRemovedEvent(device));
       }
     });
     await _connector!.connect();
