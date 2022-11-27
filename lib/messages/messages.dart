@@ -429,6 +429,7 @@ class ButtplugServerMessage {
   DeviceRemoved? deviceRemoved;
   SensorReading? sensorReading;
   RawReading? rawReading;
+  ScanningFinished? scanningFinished;
 
   factory ButtplugServerMessage.fromJson(Map<String, dynamic> json) => _$ButtplugServerMessageFromJson(json);
 
@@ -445,6 +446,7 @@ class ButtplugServerMessage {
     if (deviceRemoved != null) return deviceRemoved!.id;
     if (sensorReading != null) return sensorReading!.id;
     if (rawReading != null) return rawReading!.id;
+    if (scanningFinished != null) return scanningFinished!.id;
     throw ButtplugMessageException("No server message id available");
   }
 }

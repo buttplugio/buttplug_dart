@@ -563,7 +563,11 @@ ButtplugServerMessage _$ButtplugServerMessageFromJson(
               json['SensorReading'] as Map<String, dynamic>)
       ..rawReading = json['RawReading'] == null
           ? null
-          : RawReading.fromJson(json['RawReading'] as Map<String, dynamic>);
+          : RawReading.fromJson(json['RawReading'] as Map<String, dynamic>)
+      ..scanningFinished = json['ScanningFinished'] == null
+          ? null
+          : ScanningFinished.fromJson(
+              json['ScanningFinished'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ButtplugServerMessageToJson(
     ButtplugServerMessage instance) {
@@ -583,6 +587,7 @@ Map<String, dynamic> _$ButtplugServerMessageToJson(
   writeNotNull('DeviceRemoved', instance.deviceRemoved);
   writeNotNull('SensorReading', instance.sensorReading);
   writeNotNull('RawReading', instance.rawReading);
+  writeNotNull('ScanningFinished', instance.scanningFinished);
   return val;
 }
 
