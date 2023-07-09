@@ -1,3 +1,9 @@
+# 0.0.3 (2023-07-09)
+
+## Bugfixes
+
+- Fix de/serialization of Raw Commands in device enumeration messages.
+
 # 0.0.2 (2023-01-16)
 
 ## Features
