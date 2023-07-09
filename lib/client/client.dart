@@ -27,7 +27,7 @@ class DeviceRemovedEvent extends ButtplugClientEvent {
 class ButtplugClient {
   final String name;
   String? _serverName;
-  StreamController<ButtplugClientEvent> _eventStream = StreamController();
+  final StreamController<ButtplugClientEvent> _eventStream = StreamController();
   ButtplugClientConnector? _connector;
   final MessageSorter _sorter = MessageSorter();
   final Map<int, ButtplugClientDevice> _devices = {};
@@ -114,8 +114,6 @@ class ButtplugClient {
   Future<void> stopAllDevices() async {
     await _sendMessageExpectOk(StopAllDevices());
   }
-
-  Future<void> _parseMessage() async {}
 
   String? get serverName => _serverName;
   Map<int, ButtplugClientDevice> get devices => _devices;

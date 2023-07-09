@@ -387,7 +387,7 @@ class DeviceList with ButtplugMessage {
 
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
 class DeviceAdded extends DeviceInfo with ButtplugMessage {
-  Map<String, dynamic> toJson() => _$DeviceAddedToJson(this);
+  // toJson inherited from DeviceInfo
   factory DeviceAdded.fromJson(Map<String, dynamic> json) => _$DeviceAddedFromJson(json);
   DeviceAdded();
 }

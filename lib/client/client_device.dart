@@ -83,7 +83,7 @@ class ButtplugClientDevice {
   late final int index;
   late final String name;
   late final String? displayName;
-  late final int? _messageTimingGap;
+  late final int _messageTimingGap;
   late final ClientDeviceMessageAttributes messageAttributes;
   Function(ButtplugClientMessage msg) msgClosure;
 
@@ -91,7 +91,7 @@ class ButtplugClientDevice {
     index = deviceInfo.deviceIndex;
     name = deviceInfo.deviceName;
     displayName = deviceInfo.deviceDisplayName;
-    _messageTimingGap = deviceInfo.messageTimingGap;
+    _messageTimingGap = deviceInfo.messageTimingGap ?? 0;
     messageAttributes = deviceInfo.deviceMessages;
   }
 
@@ -106,8 +106,12 @@ class ButtplugClientDevice {
     return await msgClosure(message);
   }
 
-  bool connected() {
+  bool get connected {
     return true;
+  }
+
+  int get messageTimingGap {
+    return _messageTimingGap;
   }
 
   Future<void> vibrate(VibrateCommand command) async {
