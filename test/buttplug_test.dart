@@ -47,6 +47,23 @@ void main() {
       expect(deviceAdded.deviceMessages.scalarCmd![0].actuatorType, equals(ActuatorType.Vibrate));
     });
 
+    test('Device Added Deserialization w/ Raw Commands', () {
+      var incoming =
+          '[{"DeviceAdded":{"Id":0,"DeviceIndex":1,"DeviceName":"Lovense Diamo (Raw Messages Allowed)","DeviceMessages":{"ScalarCmd":[{"FeatureDescriptor":"N/A","ActuatorType":"Vibrate","StepCount":20}],"SensorReadCmd":[{"FeatureDescriptor":"Battery Level","SensorType":"Battery","SensorRange":[[0,100]]}],"StopDeviceCmd":{},"RawReadCmd":{"Endpoints":["rx","tx"]},"RawWriteCmd":{"Endpoints":["rx","tx"]},"RawSubscribeCmd":{"Endpoints":["rx","tx"]}}}}]';
+      List<dynamic> messageList = jsonDecode(incoming);
+      var message = ButtplugServerMessage.fromJson(messageList[0]);
+      expect(message.deviceAdded, isNotNull);
+      var deviceAdded = message.deviceAdded!;
+      expect(deviceAdded.deviceName, equals("Lovense Diamo (Raw Messages Allowed)"));
+      expect(deviceAdded.deviceMessages.scalarCmd, isNotNull);
+      expect(deviceAdded.deviceMessages.stopDeviceCmd, isNotNull);
+      expect(deviceAdded.deviceMessages.linearCmd, isNull);
+      expect(deviceAdded.deviceMessages.rawReadCmd, isNotNull);
+      expect(deviceAdded.deviceMessages.rawReadCmd!.endpoints, equals([Endpoint.Rx, Endpoint.Tx]));
+      expect(deviceAdded.deviceMessages.scalarCmd!.length, equals(1));
+      expect(deviceAdded.deviceMessages.scalarCmd![0].actuatorType, equals(ActuatorType.Vibrate));
+    });
+
     test('Handle deserializing list of Buttplug Server Messages', () {
       var incoming = '[{"Ok": {"Id":5}}]';
       List<dynamic> msgs = jsonDecode(incoming);

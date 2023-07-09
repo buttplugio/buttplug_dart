@@ -79,52 +79,51 @@ Map<String, dynamic> _$RawDeviceMessageAttributesToJson(
     };
 
 const _$EndpointEnumMap = {
-  Endpoint.Command: 'Command',
-  Endpoint.Firmware: 'Firmware',
-  Endpoint.Rx: 'Rx',
-  Endpoint.RxAccel: 'RxAccel',
-  Endpoint.RxBLEBattery: 'RxBLEBattery',
-  Endpoint.RxBLEModel: 'RxBLEModel',
-  Endpoint.RxPressure: 'RxPressure',
-  Endpoint.RxTouch: 'RxTouch',
-  Endpoint.Tx: 'Tx',
-  Endpoint.TxMode: 'TxMode',
-  Endpoint.TxShock: 'TxShock',
-  Endpoint.TxVibrate: 'TxVibrate',
-  Endpoint.TxVendorControl: 'TxVendorControl',
-  Endpoint.Whitelist: 'Whitelist',
-  Endpoint.Generic0: 'Generic0',
-  Endpoint.Generic1: 'Generic1',
-  Endpoint.Generic2: 'Generic2',
-  Endpoint.Generic3: 'Generic3',
-  Endpoint.Generic4: 'Generic4',
-  Endpoint.Generic5: 'Generic5',
-  Endpoint.Generic6: 'Generic6',
-  Endpoint.Generic7: 'Generic7',
-  Endpoint.Generic8: 'Generic8',
-  Endpoint.Generic9: 'Generic9',
-  Endpoint.Generic10: 'Generic10',
-  Endpoint.Generic11: 'Generic11',
-  Endpoint.Generic12: 'Generic12',
-  Endpoint.Generic13: 'Generic13',
-  Endpoint.Generic14: 'Generic14',
-  Endpoint.Generic15: 'Generic15',
-  Endpoint.Generic16: 'Generic16',
-  Endpoint.Generic17: 'Generic17',
-  Endpoint.Generic18: 'Generic18',
-  Endpoint.Generic19: 'Generic19',
-  Endpoint.Generic20: 'Generic20',
-  Endpoint.Generic21: 'Generic21',
-  Endpoint.Generic22: 'Generic22',
-  Endpoint.Generic23: 'Generic23',
-  Endpoint.Generic24: 'Generic24',
-  Endpoint.Generic25: 'Generic25',
-  Endpoint.Generic26: 'Generic26',
-  Endpoint.Generic27: 'Generic27',
-  Endpoint.Generic28: 'Generic28',
-  Endpoint.Generic29: 'Generic29',
-  Endpoint.Generic30: 'Generic30',
-  Endpoint.Generic31: 'Generic31',
+  Endpoint.Command: 'command',
+  Endpoint.Firmware: 'firmware',
+  Endpoint.Rx: 'rx',
+  Endpoint.RxAccel: 'rxaccel',
+  Endpoint.RxBLEBattery: 'rxblebattery',
+  Endpoint.RxBLEModel: 'rxblemodel',
+  Endpoint.RxPressure: 'rxpressure',
+  Endpoint.RxTouch: 'rxtouch',
+  Endpoint.Tx: 'tx',
+  Endpoint.TxMode: 'txmode',
+  Endpoint.TxVibrate: 'txvibrate',
+  Endpoint.TxVendorControl: 'txvendorcontrol',
+  Endpoint.Whitelist: 'txwhitelist',
+  Endpoint.Generic0: 'generic0',
+  Endpoint.Generic1: 'generic1',
+  Endpoint.Generic2: 'generic2',
+  Endpoint.Generic3: 'generic3',
+  Endpoint.Generic4: 'generic4',
+  Endpoint.Generic5: 'generic5',
+  Endpoint.Generic6: 'generic6',
+  Endpoint.Generic7: 'generic7',
+  Endpoint.Generic8: 'generic8',
+  Endpoint.Generic9: 'generic9',
+  Endpoint.Generic10: 'generic10',
+  Endpoint.Generic11: 'generic11',
+  Endpoint.Generic12: 'generic12',
+  Endpoint.Generic13: 'generic13',
+  Endpoint.Generic14: 'generic14',
+  Endpoint.Generic15: 'generic15',
+  Endpoint.Generic16: 'generic16',
+  Endpoint.Generic17: 'generic17',
+  Endpoint.Generic18: 'generic18',
+  Endpoint.Generic19: 'generic19',
+  Endpoint.Generic20: 'generic20',
+  Endpoint.Generic21: 'generic21',
+  Endpoint.Generic22: 'generic22',
+  Endpoint.Generic23: 'generic23',
+  Endpoint.Generic24: 'generic24',
+  Endpoint.Generic25: 'generic25',
+  Endpoint.Generic26: 'generic26',
+  Endpoint.Generic27: 'generic27',
+  Endpoint.Generic28: 'generic28',
+  Endpoint.Generic29: 'generic29',
+  Endpoint.Generic30: 'generic30',
+  Endpoint.Generic31: 'generic31',
 };
 
 ClientDeviceMessageAttributes _$ClientDeviceMessageAttributesFromJson(
@@ -152,18 +151,18 @@ ClientDeviceMessageAttributes _$ClientDeviceMessageAttributesFromJson(
           .toList()
       ..stopDeviceCmd = NullDeviceMessageAttributes.fromJson(
           json['StopDeviceCmd'] as Map<String, dynamic>)
-      ..rawReadCmd = (json['RawReadCmd'] as List<dynamic>?)
-          ?.map((e) =>
-              RawDeviceMessageAttributes.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..rawWriteCmd = (json['RawWriteCmd'] as List<dynamic>?)
-          ?.map((e) =>
-              RawDeviceMessageAttributes.fromJson(e as Map<String, dynamic>))
-          .toList()
-      ..rawSubscribeCmd = (json['RawSubscribeCmd'] as List<dynamic>?)
-          ?.map((e) =>
-              RawDeviceMessageAttributes.fromJson(e as Map<String, dynamic>))
-          .toList();
+      ..rawReadCmd = json['RawReadCmd'] == null
+          ? null
+          : RawDeviceMessageAttributes.fromJson(
+              json['RawReadCmd'] as Map<String, dynamic>)
+      ..rawWriteCmd = json['RawWriteCmd'] == null
+          ? null
+          : RawDeviceMessageAttributes.fromJson(
+              json['RawWriteCmd'] as Map<String, dynamic>)
+      ..rawSubscribeCmd = json['RawSubscribeCmd'] == null
+          ? null
+          : RawDeviceMessageAttributes.fromJson(
+              json['RawSubscribeCmd'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ClientDeviceMessageAttributesToJson(
     ClientDeviceMessageAttributes instance) {

@@ -59,9 +59,9 @@ class ClientDeviceMessageAttributes {
   List<SensorDeviceMessageAttributes>? sensorSubscribeCmd;
   // This is the only message that should always exist, so don't mark it nullable. If it's null, our parser should throw.
   NullDeviceMessageAttributes stopDeviceCmd = NullDeviceMessageAttributes();
-  List<RawDeviceMessageAttributes>? rawReadCmd;
-  List<RawDeviceMessageAttributes>? rawWriteCmd;
-  List<RawDeviceMessageAttributes>? rawSubscribeCmd;
+  RawDeviceMessageAttributes? rawReadCmd;
+  RawDeviceMessageAttributes? rawWriteCmd;
+  RawDeviceMessageAttributes? rawSubscribeCmd;
 
   Map<String, dynamic> toJson() => _$ClientDeviceMessageAttributesToJson(this);
   factory ClientDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>
