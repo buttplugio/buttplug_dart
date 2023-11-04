@@ -20,7 +20,9 @@ class MessageSorter {
     StreamController<ButtplugServerMessage> responseStream = StreamController();
     var responseCompleter = Completer<ButtplugServerMessage>();
     responseStream.stream.listen((ButtplugServerMessage msg) {
-      responseCompleter.complete(msg);
+      if (!responseCompleter.isCompleted) {
+        responseCompleter.complete(msg);
+      }
     });
     waitingFutures[messageCounter] = MessageCompletionFuture(responseStream.sink, Future(() async {
       return await responseCompleter.future;
