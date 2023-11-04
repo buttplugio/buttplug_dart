@@ -39,7 +39,10 @@ class MessageSorter {
   }
 
   void checkMessage(ButtplugServerMessage incoming) {
-    if (!waitingFutures.containsKey(incoming.id)) {}
+    if (!waitingFutures.containsKey(incoming.id)) {
+      logWarning("No message with ${incoming.id} currently being waited on");
+      return;
+    }
     waitingFutures[incoming.id]!.completionSink.add(incoming);
   }
 }
