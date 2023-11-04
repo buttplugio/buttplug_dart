@@ -1,3 +1,10 @@
+# 0.0.4 (2023-11-04)
+
+## Bugfixes
+
+- Check if futures are completed before trying to resolve them again
+- Check if we're waiting on a specific future before trying to resolve it
+
 # 0.0.3 (2023-07-09)
 
 ## Bugfixes
