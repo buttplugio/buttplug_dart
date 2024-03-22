@@ -18,6 +18,7 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
     _wsChannel = WebSocketChannel.connect(
       Uri.parse('ws://127.0.0.1:12345'),
     );
+    await _wsChannel?.ready;
     _wsChannel!.stream.forEach((element) async {
       try {
         List<dynamic> msgs = jsonDecode(element);
