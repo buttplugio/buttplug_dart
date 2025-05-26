@@ -279,14 +279,16 @@ Map<String, dynamic> _$ScanningFinishedToJson(ScanningFinished instance) =>
 ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo()
   ..id = (json['Id'] as num).toInt()
   ..serverName = json['ServerName'] as String
-  ..messageVersion = (json['MessageVersion'] as num).toInt()
+  ..apiVersionMajor = (json['ApiVersionMajor'] as num).toInt()
+  ..apiVersionMinor = (json['ApiVersionMinor'] as num).toInt()
   ..maxPingTime = (json['MaxPingTime'] as num).toInt();
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
     <String, dynamic>{
       'Id': instance.id,
       'ServerName': instance.serverName,
-      'MessageVersion': instance.messageVersion,
+      'ApiVersionMajor': instance.apiVersionMajor,
+      'ApiVersionMinor': instance.apiVersionMinor,
       'MaxPingTime': instance.maxPingTime,
     };
 

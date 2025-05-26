@@ -299,7 +299,8 @@ class ScanningFinished with ButtplugMessage {
 class ServerInfo with ButtplugMessage {
   String serverName = "";
   // This should also be 3, but we'll check that on connect.
-  int messageVersion = 0;
+  int apiVersionMajor = 0;
+  int apiVersionMinor = 0;
   int maxPingTime = 0;
   Map<String, dynamic> toJson() => _$ServerInfoToJson(this);
   factory ServerInfo.fromJson(Map<String, dynamic> json) => _$ServerInfoFromJson(json);
