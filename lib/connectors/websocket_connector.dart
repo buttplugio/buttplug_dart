@@ -1,15 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:buttplug/connectors/connector.dart';
-import 'package:buttplug/messages/messages.dart';
-import 'package:loggy/loggy.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+part of '../buttplug.dart';
 
 class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
   String address;
   WebSocketChannel? _wsChannel;
-  final StreamController<ButtplugServerMessage> _serverMessageStream = StreamController();
+  final StreamController<ButtplugServerMessage> _serverMessageStream = StreamController.broadcast();
 
   ButtplugWebsocketClientConnector(this.address);
 
@@ -21,12 +15,14 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
     await _wsChannel?.ready;
     _wsChannel!.stream.forEach((element) async {
       try {
+        logInfo(element);
         List<dynamic> msgs = jsonDecode(element);
         for (var msg in msgs) {
           _serverMessageStream.add(ButtplugServerMessage.fromJson(msg));
         }
-      } catch (e) {
+      } catch (e, s) {
         logError("Error adding message to stream: $e");
+        logError(s);
         await disconnect();
       }
     });
@@ -39,8 +35,8 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
   }
 
   @override
-  void send(ButtplugClientMessageUnion message) {
-    String msg = jsonEncode([message]);
+  void send(List<ButtplugClientMessageUnion> messages) {
+    String msg = jsonEncode(messages);
     _wsChannel!.sink.add(msg);
   }
 

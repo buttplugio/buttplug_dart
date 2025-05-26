@@ -1,8 +1,8 @@
-import 'package:buttplug/messages/messages.dart';
+part of "../buttplug.dart";
 
 abstract class ButtplugClientConnector {
   Future<void> connect();
   Future<void> disconnect();
-  void send(ButtplugClientMessageUnion message);
+  void send(List<ButtplugClientMessageUnion> message);
   Stream<ButtplugServerMessage> get messageStream;
 }

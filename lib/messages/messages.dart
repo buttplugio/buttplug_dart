@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:buttplug/messages/enums.dart';
 
 part 'messages.g.dart';
 
@@ -10,63 +9,44 @@ class ButtplugMessageException implements Exception {
 
 // Device Utility Classes
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class ClientGenericDeviceMessageAttributes {
-  String featureDescriptor = "";
-  ActuatorType actuatorType = ActuatorType.Vibrate;
+class ClientDeviceFeatureActuator {
   int stepCount = 0;
-
-  Map<String, dynamic> toJson() => _$ClientGenericDeviceMessageAttributesToJson(this);
-  factory ClientGenericDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>
-      _$ClientGenericDeviceMessageAttributesFromJson(json);
-  ClientGenericDeviceMessageAttributes();
+  List<String> messages = [];
+  Map<String, dynamic> toJson() => _$ClientDeviceFeatureActuatorToJson(this);
+  factory ClientDeviceFeatureActuator.fromJson(Map<String, dynamic> json) =>
+      _$ClientDeviceFeatureActuatorFromJson(json);
+  ClientDeviceFeatureActuator();
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class SensorDeviceMessageAttributes {
-  String featureDescriptor = "";
-  SensorType sensorType = SensorType.Pressure;
-  List<List<int>> sensorRange = [];
-
-  Map<String, dynamic> toJson() => _$SensorDeviceMessageAttributesToJson(this);
-  factory SensorDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>
-      _$SensorDeviceMessageAttributesFromJson(json);
-  SensorDeviceMessageAttributes();
+class ClientDeviceFeatureSensor {
+  List<List<int>> valueRange = [];
+  List<String> messages = [];
+  Map<String, dynamic> toJson() => _$ClientDeviceFeatureSensorToJson(this);
+  factory ClientDeviceFeatureSensor.fromJson(Map<String, dynamic> json) => _$ClientDeviceFeatureSensorFromJson(json);
+  ClientDeviceFeatureSensor();
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class NullDeviceMessageAttributes {
-  Map<String, dynamic> toJson() => _$NullDeviceMessageAttributesToJson(this);
-  factory NullDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>
-      _$NullDeviceMessageAttributesFromJson(json);
-  NullDeviceMessageAttributes();
+class ClientDeviceFeatureRaw {
+  List<String> endpoints = [];
+  List<String> messages = [];
+  Map<String, dynamic> toJson() => _$ClientDeviceFeatureRawToJson(this);
+  factory ClientDeviceFeatureRaw.fromJson(Map<String, dynamic> json) => _$ClientDeviceFeatureRawFromJson(json);
+  ClientDeviceFeatureRaw();
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class RawDeviceMessageAttributes {
-  List<Endpoint> endpoints = [];
-
-  Map<String, dynamic> toJson() => _$RawDeviceMessageAttributesToJson(this);
-  factory RawDeviceMessageAttributes.fromJson(Map<String, dynamic> json) => _$RawDeviceMessageAttributesFromJson(json);
-  RawDeviceMessageAttributes();
-}
-
-@JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
-class ClientDeviceMessageAttributes {
-  List<ClientGenericDeviceMessageAttributes>? scalarCmd;
-  List<ClientGenericDeviceMessageAttributes>? rotateCmd;
-  List<ClientGenericDeviceMessageAttributes>? linearCmd;
-  List<SensorDeviceMessageAttributes>? sensorReadCmd;
-  List<SensorDeviceMessageAttributes>? sensorSubscribeCmd;
-  // This is the only message that should always exist, so don't mark it nullable. If it's null, our parser should throw.
-  NullDeviceMessageAttributes stopDeviceCmd = NullDeviceMessageAttributes();
-  RawDeviceMessageAttributes? rawReadCmd;
-  RawDeviceMessageAttributes? rawWriteCmd;
-  RawDeviceMessageAttributes? rawSubscribeCmd;
-
-  Map<String, dynamic> toJson() => _$ClientDeviceMessageAttributesToJson(this);
-  factory ClientDeviceMessageAttributes.fromJson(Map<String, dynamic> json) =>
-      _$ClientDeviceMessageAttributesFromJson(json);
-  ClientDeviceMessageAttributes();
+class ClientDeviceFeature {
+  int featureIndex = 0;
+  String description = "";
+  String featureType = "";
+  ClientDeviceFeatureActuator? actuator;
+  ClientDeviceFeatureSensor? sensor;
+  ClientDeviceFeatureRaw? raw;
+  Map<String, dynamic> toJson() => _$ClientDeviceFeatureToJson(this);
+  factory ClientDeviceFeature.fromJson(Map<String, dynamic> json) => _$ClientDeviceFeatureFromJson(json);
+  ClientDeviceFeature();
 }
 
 mixin ButtplugMessage {
@@ -87,7 +67,7 @@ abstract class ButtplugClientMessage with ButtplugMessage {
 class RequestServerInfo with ButtplugMessage implements ButtplugClientMessage {
   String clientName = "";
   // This will not change until we rev this message set, so set it statically.
-  int messageVersion = 3;
+  int messageVersion = 4;
   Map<String, dynamic> toJson() => _$RequestServerInfoToJson(this);
   factory RequestServerInfo.fromJson(Map<String, dynamic> json) => _$RequestServerInfoFromJson(json);
   RequestServerInfo();
@@ -165,73 +145,34 @@ class StopAllDevices with ButtplugMessage implements ButtplugClientMessage {
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class ScalarSubcommand {
-  int index = 0;
-  double scalar = 0;
-  ActuatorType actuatorType = ActuatorType.Vibrate;
-  Map<String, dynamic> toJson() => _$ScalarSubcommandToJson(this);
-  factory ScalarSubcommand.fromJson(Map<String, dynamic> json) => _$ScalarSubcommandFromJson(json);
-  ScalarSubcommand(this.index, this.scalar, this.actuatorType);
-}
-
-@JsonSerializable(fieldRename: FieldRename.pascal)
-class ScalarCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
-  List<ScalarSubcommand> scalars = [];
-  Map<String, dynamic> toJson() => _$ScalarCmdToJson(this);
-  factory ScalarCmd.fromJson(Map<String, dynamic> json) => _$ScalarCmdFromJson(json);
-  ScalarCmd();
+class ValueCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  int featureIndex = 0;
+  int value = 0;
+  String actuatorType = "";
+  Map<String, dynamic> toJson() => _$ValueCmdToJson(this);
+  factory ValueCmd.fromJson(Map<String, dynamic> json) => _$ValueCmdFromJson(json);
+  ValueCmd();
   @override
   ButtplugClientMessageUnion asClientMessageUnion() {
     var msg = ButtplugClientMessageUnion();
-    msg.scalarCmd = this;
+    msg.valueCmd = this;
     return msg;
   }
 }
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
-class RotateSubcommand {
-  int index = 0;
-  double speed = 0;
-  bool clockwise = false;
-  Map<String, dynamic> toJson() => _$RotateSubcommandToJson(this);
-  factory RotateSubcommand.fromJson(Map<String, dynamic> json) => _$RotateSubcommandFromJson(json);
-  RotateSubcommand(this.index, this.speed, this.clockwise);
-}
-
-@JsonSerializable(fieldRename: FieldRename.pascal)
-class RotateCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
-  List<RotateSubcommand> rotations = [];
-  Map<String, dynamic> toJson() => _$RotateCmdToJson(this);
-  factory RotateCmd.fromJson(Map<String, dynamic> json) => _$RotateCmdFromJson(json);
-  RotateCmd();
+class ValueWithParameterCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
+  int featureIndex = 0;
+  int value = 0;
+  int parameter = 0;
+  String actuatorType = "";
+  Map<String, dynamic> toJson() => _$ValueWithParameterCmdToJson(this);
+  factory ValueWithParameterCmd.fromJson(Map<String, dynamic> json) => _$ValueWithParameterCmdFromJson(json);
+  ValueWithParameterCmd();
   @override
   ButtplugClientMessageUnion asClientMessageUnion() {
     var msg = ButtplugClientMessageUnion();
-    msg.rotateCmd = this;
-    return msg;
-  }
-}
-
-@JsonSerializable(fieldRename: FieldRename.pascal)
-class LinearSubcommand {
-  int index = 0;
-  double position = 0;
-  int duration = 0;
-  Map<String, dynamic> toJson() => _$LinearSubcommandToJson(this);
-  factory LinearSubcommand.fromJson(Map<String, dynamic> json) => _$LinearSubcommandFromJson(json);
-  LinearSubcommand(this.index, this.position, this.duration);
-}
-
-@JsonSerializable(fieldRename: FieldRename.pascal)
-class LinearCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
-  List<LinearSubcommand> vectors = [];
-  Map<String, dynamic> toJson() => _$LinearCmdToJson(this);
-  factory LinearCmd.fromJson(Map<String, dynamic> json) => _$LinearCmdFromJson(json);
-  LinearCmd();
-  @override
-  ButtplugClientMessageUnion asClientMessageUnion() {
-    var msg = ButtplugClientMessageUnion();
-    msg.linearCmd = this;
+    msg.valueWithParameterCmd = this;
     return msg;
   }
 }
@@ -239,7 +180,7 @@ class LinearCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugC
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class SensorReadCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
   int sensorIndex = 0;
-  SensorType sensorType = SensorType.Battery;
+  String sensorType = "";
   Map<String, dynamic> toJson() => _$SensorReadCmdToJson(this);
   factory SensorReadCmd.fromJson(Map<String, dynamic> json) => _$SensorReadCmdFromJson(json);
   SensorReadCmd();
@@ -371,7 +312,7 @@ class DeviceInfo {
   String deviceName = "";
   String? deviceDisplayName;
   int? messageTimingGap;
-  ClientDeviceMessageAttributes deviceMessages = ClientDeviceMessageAttributes();
+  List<ClientDeviceFeature> deviceFeatures = [];
   Map<String, dynamic> toJson() => _$DeviceInfoToJson(this);
   factory DeviceInfo.fromJson(Map<String, dynamic> json) => _$DeviceInfoFromJson(json);
   DeviceInfo();
@@ -403,7 +344,7 @@ class DeviceRemoved with ButtplugMessage {
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class SensorReading with ButtplugMessage, ButtplugDeviceMessage {
   int sensorIndex = 0;
-  SensorType sensorType = SensorType.Battery;
+  String sensorType = "";
   List<int> data = [];
   Map<String, dynamic> toJson() => _$SensorReadingToJson(this);
   factory SensorReading.fromJson(Map<String, dynamic> json) => _$SensorReadingFromJson(json);
@@ -459,9 +400,8 @@ class ButtplugClientMessageUnion {
   StartScanning? startScanning;
   StopScanning? stopScanning;
   StopAllDevices? stopAllDevices;
-  ScalarCmd? scalarCmd;
-  RotateCmd? rotateCmd;
-  LinearCmd? linearCmd;
+  ValueCmd? valueCmd;
+  ValueWithParameterCmd? valueWithParameterCmd;
   SensorReadCmd? sensorReadCmd;
   SensorSubscribeCmd? sensorSubscribeCmd;
   SensorUnsubscribeCmd? sensorUnsubscribeCmd;
@@ -483,9 +423,8 @@ class ButtplugClientMessageUnion {
     if (startScanning != null) return startScanning!.id;
     if (stopScanning != null) return stopScanning!.id;
     if (stopAllDevices != null) return stopAllDevices!.id;
-    if (scalarCmd != null) return scalarCmd!.id;
-    if (rotateCmd != null) return rotateCmd!.id;
-    if (linearCmd != null) return linearCmd!.id;
+    if (valueCmd != null) return valueCmd!.id;
+    if (valueWithParameterCmd != null) return valueWithParameterCmd!.id;
     if (sensorReadCmd != null) return sensorReadCmd!.id;
     if (sensorSubscribeCmd != null) return sensorSubscribeCmd!.id;
     if (sensorUnsubscribeCmd != null) return sensorUnsubscribeCmd!.id;

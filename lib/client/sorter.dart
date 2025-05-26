@@ -1,19 +1,16 @@
-import 'dart:async';
+part of '../buttplug.dart';
 
-import 'package:buttplug/messages/messages.dart';
-import 'package:loggy/loggy.dart';
-
-class MessageCompletionFuture {
+class _MessageCompletionFuture {
   Future<ButtplugServerMessage> completionFuture;
   Sink<ButtplugServerMessage> completionSink;
-  MessageCompletionFuture(this.completionSink, this.completionFuture);
+  _MessageCompletionFuture(this.completionSink, this.completionFuture);
 }
 
-class MessageSorter {
+class _MessageSorter {
   int messageCounter = 1;
-  Map<int, MessageCompletionFuture> waitingFutures = {};
+  Map<int, _MessageCompletionFuture> waitingFutures = {};
 
-  MessageSorter();
+  _MessageSorter();
 
   void prepareMessage(ButtplugMessage outgoing) {
     outgoing.id = messageCounter;
@@ -24,7 +21,7 @@ class MessageSorter {
         responseCompleter.complete(msg);
       }
     });
-    waitingFutures[messageCounter] = MessageCompletionFuture(responseStream.sink, Future(() async {
+    waitingFutures[messageCounter] = _MessageCompletionFuture(responseStream.sink, Future(() async {
       return await responseCompleter.future;
     }));
     messageCounter += 1;

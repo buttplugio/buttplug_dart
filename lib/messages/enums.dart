@@ -1,5 +1,6 @@
+part of "../buttplug.dart";
+
 // ignore_for_file: constant_identifier_names
-import 'package:json_annotation/json_annotation.dart';
 
 // This should match what's in buttplug's rust server impl, but this is *not standardized*.
 enum Endpoint {
@@ -186,7 +187,16 @@ enum Endpoint {
 }
 
 // This should match what's in buttplug's rust server impl, but this is *not standardized*.
-enum ActuatorType { Vibrate, Rotate, Oscillate, Constrict, Inflate, Position }
+enum ActuatorType {
+  Vibrate,
+  Rotate,
+  Oscillate,
+  Constrict,
+  Inflate,
+  Position,
+  PositionWithDuration,
+  RotateWithDirection
+}
 
 // This should match what's in buttplug's rust server impl, but this is *not standardized*.
 enum SensorType { Battery, RSSI, Button, Pressure, Temperature }
