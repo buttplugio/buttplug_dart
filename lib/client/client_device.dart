@@ -5,15 +5,18 @@ class ButtplugClientDevice {
   late final String name;
   late final String? displayName;
   late final int _messageTimingGap;
-  late final List<ButtplugClientDeviceFeature> features;
+  late final Map<int, ButtplugClientDeviceFeature> features;
   final _ButtplugClientCommunicator _communicator;
 
   ButtplugClientDevice._(DeviceInfo deviceInfo, this._communicator) {
     index = deviceInfo.deviceIndex;
     name = deviceInfo.deviceName;
     displayName = deviceInfo.deviceDisplayName;
-    _messageTimingGap = deviceInfo.messageTimingGap ?? 0;
-    features = deviceInfo.deviceFeatures.map((x) => ButtplugClientDeviceFeature._(_communicator, index, x)).toList();
+    _messageTimingGap = deviceInfo.deviceMessageTimingGap ?? 0;
+    features = {
+      for (var v in deviceInfo.deviceFeatures.values)
+        v.featureIndex: ButtplugClientDeviceFeature._(_communicator, index, v),
+    };
   }
 
   bool get connected {
@@ -24,66 +27,29 @@ class ButtplugClientDevice {
     return _messageTimingGap;
   }
 
-  Future<void> _runValueCmd(ActuatorType actuator, int value) async {
-    var msgs = features
-        .where((x) => x.feature.featureType == actuator.name)
-        .map((x) => x._generateValueCmd(actuator, value))
+  Future<void> runOutput(DeviceOutputCommand cmd) async {
+    var msgs = features.values
+        .where((x) => x.feature.output != null && x.feature.output!.containsKey(cmd.outputType))
+        .map((x) => x._generateOutputCmd(cmd))
         .toList();
     if (msgs.isEmpty) {
-      throw ButtplugClientDeviceException("$name does not support $actuator commands");
+      throw ButtplugClientDeviceException("$name does not support ${cmd.outputType} commands");
     }
     await _communicator.sendMessagesExpectOk(msgs);
   }
 
-  Future<void> _runValueWithParameterCmd(ActuatorType actuator, int value, int parameter) async {
-    var msgs = features
-        .where((x) => x.feature.featureType == actuator.name)
-        .map((x) => x._generateValueWithParameterCmd(actuator, value, parameter))
-        .toList();
-    if (msgs.isEmpty) {
-      throw ButtplugClientDeviceException("$name does not support $actuator commands");
-    }
-    await _communicator.sendMessagesExpectOk(msgs);
-  }
-
-  Future<void> vibrate(int speed) async {
-    _runValueCmd(ActuatorType.Vibrate, speed);
-  }
-
-  Future<void> oscillate(int speed) async {
-    await _runValueCmd(ActuatorType.Oscillate, speed);
-  }
-
-  Future<void> rotate(int speed) async {
-    await _runValueCmd(ActuatorType.Rotate, speed);
-  }
-
-  Future<void> constrict(int level) async {
-    await _runValueCmd(ActuatorType.Constrict, level);
-  }
-
-  Future<void> inflate(int level) async {
-    await _runValueCmd(ActuatorType.Inflate, level);
-  }
-
-  Future<void> position(int position) async {
-    await _runValueCmd(ActuatorType.Position, position);
-  }
-
-  Future<void> positionWithDuration(int position, int duration) async {
-    await _runValueWithParameterCmd(ActuatorType.PositionWithDuration, position, duration);
-  }
-
-  Future<void> rotateWithDirection(int speed, bool clockwise) async {
-    await _runValueWithParameterCmd(ActuatorType.RotateWithDirection, speed, clockwise ? 1 : 0);
-  }
-
+  /*
   Future<int> battery() async {
-    var msgs =
-        features.where((x) => x.feature.featureType == SensorType.Battery.toString()).map((x) => x.battery()).toList();
+
+    var msgs = features
+        .where((x) => x.feature.featureType == SensorType.Battery.toString())
+        .map((x) => x.battery())
+        .toList();
     if (msgs.isEmpty) {
       throw ButtplugClientDeviceException("$name does not support battery commands");
     }
     return await msgs[0];
+
   }
+  */
 }

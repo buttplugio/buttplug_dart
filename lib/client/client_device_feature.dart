@@ -7,35 +7,7 @@ class ButtplugClientDeviceFeature {
 
   ButtplugClientDeviceFeature._(this._communicator, this.deviceIndex, this.feature);
 
-  ValueWithParameterCmd _generateValueWithParameterCmd(ActuatorType featureType, int value, int parameter) {
-    if (feature.featureType != featureType.name ||
-        feature.actuator == null ||
-        !feature.actuator!.messages.contains("ValueWithParameterCmd")) {
-      throw ButtplugClientDeviceException("${feature.description} does not support $featureType commands");
-    }
-    var msg = ValueWithParameterCmd();
-    msg.value = value;
-    msg.parameter = parameter;
-    msg.actuatorType = feature.featureType;
-    msg.deviceIndex = deviceIndex;
-    msg.featureIndex = feature.featureIndex;
-    return msg;
-  }
-
-  ValueCmd _generateValueCmd(ActuatorType featureType, int value) {
-    if (feature.featureType != featureType.name ||
-        feature.actuator == null ||
-        !feature.actuator!.messages.contains("ValueCmd")) {
-      throw ButtplugClientDeviceException("${feature.description} does not support $featureType commands");
-    }
-    var msg = ValueCmd();
-    msg.value = value;
-    msg.actuatorType = feature.featureType;
-    msg.deviceIndex = deviceIndex;
-    msg.featureIndex = feature.featureIndex;
-    return msg;
-  }
-
+  /*
   Future<List<int>> _sensorRead(SensorType sensorType) async {
     if (feature.sensor == null) {
       throw ButtplugClientDeviceException("${feature.description} does not have a readable sensor");
@@ -50,49 +22,64 @@ class ButtplugClientDeviceFeature {
     }
     return returnMsg.sensorReading!.data;
   }
+  */
 
-  Future<void> _runValueCmd(ActuatorType actuator, int value) async {
-    await _communicator.sendMessageExpectOk(_generateValueCmd(actuator, value));
+  void _isOutputValid(OutputType type) {
+    if (feature.output != null && !feature.output!.containsKey(type)) {
+      throw "Feature index ${feature.featureIndex} does not support type $type for device";
+    }
   }
 
-  Future<void> _runValueWithParameterCmd(ActuatorType actuator, int value, int parameter) async {
-    await _communicator.sendMessageExpectOk(_generateValueWithParameterCmd(actuator, value, parameter));
+  OutputCmd _generateOutputCmd(DeviceOutputCommand command) {
+    ClientDeviceFeatureOutput newCommand = ClientDeviceFeatureOutput();
+    // Make sure the requested feature is valid
+    _isOutputValid(command.outputType);
+
+    var type = command.outputType;
+
+    if (type == OutputType.position || type == OutputType.positionWithDuration) {
+      if (command.position == null) {
+        throw "Position or PositionWithDuration requires position defined";
+      }
+      var p = command.position;
+      if (p != null && p.percent == null) {
+        newCommand.position = command.position!.steps;
+      } else {
+        newCommand.position = (feature.output![type]!.position![1] * p!.percent!).ceil();
+      }
+      if (type == OutputType.positionWithDuration) {
+        if (command.duration == null) {
+          throw "PositionWithDuration requires duration defined";
+        }
+        newCommand.duration = command.duration;
+      }
+    } else {
+      if (command.value == null) {
+        throw "$type requires value defined";
+      }
+      var p = command.value;
+      if (p!.percent == null) {
+        // TODO Check step limits here
+        newCommand.value = command.value!.steps;
+      } else {
+        newCommand.value = (feature.output![type]!.value![1] * p.percent!).ceil();
+      }
+    }
+    var msg = OutputCmd();
+    msg.command[type] = newCommand;
+    msg.deviceIndex = deviceIndex;
+    msg.featureIndex = feature.featureIndex;
+    return msg;
   }
 
-  Future<void> vibrate(int speed) async {
-    await _runValueCmd(ActuatorType.Vibrate, speed);
+  bool hasOutput(OutputType type) {
+    if (feature.output != null) {
+      return feature.output!.containsKey(type);
+    }
+    return false;
   }
 
-  Future<void> oscillate(int speed) async {
-    await _runValueCmd(ActuatorType.Oscillate, speed);
-  }
-
-  Future<void> rotate(int speed) async {
-    await _runValueCmd(ActuatorType.Rotate, speed);
-  }
-
-  Future<void> constrict(int level) async {
-    await _runValueCmd(ActuatorType.Constrict, level);
-  }
-
-  Future<void> inflate(int level) async {
-    await _runValueCmd(ActuatorType.Inflate, level);
-  }
-
-  Future<void> position(int position) async {
-    await _runValueCmd(ActuatorType.Position, position);
-  }
-
-  Future<void> positionWithDuration(int position, int duration) async {
-    await _runValueWithParameterCmd(ActuatorType.PositionWithDuration, position, duration);
-  }
-
-  Future<void> rotateWithDirection(int speed, bool clockwise) async {
-    await _runValueWithParameterCmd(ActuatorType.RotateWithDirection, speed, clockwise ? 1 : 0);
-  }
-
-  Future<int> battery() async {
-    var levels = await _sensorRead(SensorType.Battery);
-    return levels[0];
+  Future<void> runOutput(DeviceOutputCommand cmd) async {
+    await _communicator.sendMessageExpectOk(_generateOutputCmd(cmd));
   }
 }

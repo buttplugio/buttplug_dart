@@ -7,6 +7,7 @@ import 'messages/messages.dart';
 
 part 'client/client.dart';
 part 'client/client_communicator.dart';
+part 'client/client_device_command.dart';
 part 'client/client_device.dart';
 part 'client/client_device_feature.dart';
 part 'client/sorter.dart';

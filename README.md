@@ -6,7 +6,9 @@
 [![Discord](https://img.shields.io/discord/353303527587708932.svg?logo=discord)](https://discord.buttplug.io)
 [![Twitter](https://img.shields.io/twitter/follow/buttplugio.svg?style=social&logo=twitter)](https://twitter.com/buttplugio)
 
-Implementation of a Buttplug Message Spec v3 client in Pure Dart. Requires no outside FFI.
+Implementation of a Buttplug Message Spec v4 client in Pure Dart.
+
+As this is mostly built for Intiface Central on Desktop/Mobile, this library is **NOT MADE** to work with web-compiled dart. We make certain assumptions about int/float comparisons that **WILL FAIL** when compiled to WASM. If you need a WASM version of this for some reason, leave an issue and it can be discussed.
 
 ## Getting started
 

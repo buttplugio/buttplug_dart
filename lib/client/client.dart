@@ -19,6 +19,10 @@ class DeviceRemovedEvent extends ButtplugClientEvent {
   DeviceRemovedEvent(this.device);
 }
 
+class DeviceListReceivedEvent extends ButtplugClientEvent {
+  DeviceListReceivedEvent();
+}
+
 class ButtplugClient {
   final String name;
   String? _serverName;
@@ -30,15 +34,28 @@ class ButtplugClient {
   Future<void> connect(ButtplugClientConnector connector) async {
     _communicator = _ButtplugClientCommunicator(connector);
     connector.messageStream.listen((message) {
-      if (message.deviceAdded != null) {
-        var device = ButtplugClientDevice._(message.deviceAdded!, _communicator!);
-        _devices[device.index] = device;
-        _communicator!.eventStreamController.add(DeviceAddedEvent(device));
-      }
-      if (message.deviceRemoved != null) {
-        var device = _devices[message.deviceRemoved!.deviceIndex]!;
-        _devices.remove(message.deviceRemoved!.deviceIndex);
-        _communicator!.eventStreamController.add(DeviceRemovedEvent(device));
+      if (message.deviceList != null) {
+        for (var deviceInfo in message.deviceList!.devices.values) {
+          if (!_devices.containsKey(deviceInfo.deviceIndex)) {
+            var device = ButtplugClientDevice._(deviceInfo, _communicator!);
+            _devices[device.index] = device;
+            _communicator!.eventStreamController.add(DeviceAddedEvent(device));
+          }
+        }
+        List<int> removedDevices = [];
+        for (var index in _devices.keys) {
+          if (_devices.keys
+              .where((x) => message.deviceList!.devices.values.where((y) => index == y.deviceIndex).isEmpty)
+              .isEmpty) {
+            removedDevices.add(index);
+          }
+        }
+        for (var removedIndex in removedDevices) {
+          var device = _devices[removedIndex]!;
+          _devices.remove(removedIndex);
+          _communicator!.eventStreamController.add(DeviceRemovedEvent(device));
+        }
+        _communicator!.eventStreamController.add(DeviceListReceivedEvent());
       }
     });
 
@@ -50,7 +67,8 @@ class ButtplugClient {
     ButtplugServerMessage serverInfo = await _communicator!.sendMessageExpectReply(requestServerInfo);
     if (serverInfo.serverInfo == null) {
       throw ButtplugClientException(
-          "Did not receive ServerInfo message back from server on handshake: ${jsonEncode(serverInfo.toJson())}.");
+        "Did not receive ServerInfo message back from server on handshake: ${jsonEncode(serverInfo.toJson())}.",
+      );
     }
     _serverName = serverInfo.serverInfo!.serverName;
 
@@ -61,7 +79,7 @@ class ButtplugClient {
       throw ButtplugClientException("Did not receive DeviceList message back from server on handshake.");
     }
     var deviceList = deviceListWrapper.deviceList!;
-    for (var device in deviceList.devices) {
+    for (var device in deviceList.devices.values) {
       _devices[device.deviceIndex] = ButtplugClientDevice._(device, _communicator!);
     }
   }
