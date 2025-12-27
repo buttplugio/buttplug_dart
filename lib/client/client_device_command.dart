@@ -1,4 +1,4 @@
-part of '../buttplug.dart';
+import 'package:buttplug/messages/messages.dart';
 
 class PercentOrSteps {
   final int? steps;
@@ -21,85 +21,85 @@ class DeviceOutputCommand {
   final PercentOrSteps? position;
   final int? duration;
 
-  DeviceOutputCommand._(this.outputType, this.value, this.position, this.duration);
+  DeviceOutputCommand(this.outputType, this.value, this.position, this.duration);
 }
 
 class DeviceOutputValueConstructor {
   final OutputType _outputType;
 
-  DeviceOutputValueConstructor._(this._outputType);
+  DeviceOutputValueConstructor(this._outputType);
 
   DeviceOutputCommand steps(int steps) {
-    return DeviceOutputCommand._(_outputType, PercentOrSteps.fromSteps(steps), null, null);
+    return DeviceOutputCommand(_outputType, PercentOrSteps.fromSteps(steps), null, null);
   }
 
   DeviceOutputCommand percent(double percent) {
-    return DeviceOutputCommand._(_outputType, PercentOrSteps.fromPercent(percent), null, null);
+    return DeviceOutputCommand(_outputType, PercentOrSteps.fromPercent(percent), null, null);
   }
 }
 
 class DeviceOutputPositionConstructor {
-  DeviceOutputPositionConstructor._();
+  DeviceOutputPositionConstructor();
 
   DeviceOutputCommand steps(int steps) {
-    return DeviceOutputCommand._(OutputType.position, null, PercentOrSteps.fromSteps(steps), null);
+    return DeviceOutputCommand(OutputType.position, null, PercentOrSteps.fromSteps(steps), null);
   }
 
   DeviceOutputCommand percent(double percent) {
-    return DeviceOutputCommand._(OutputType.position, null, PercentOrSteps.fromPercent(percent), null);
+    return DeviceOutputCommand(OutputType.position, null, PercentOrSteps.fromPercent(percent), null);
   }
 }
 
 class DeviceOutputPositionWithDurationConstructor {
-  DeviceOutputPositionWithDurationConstructor._();
+  DeviceOutputPositionWithDurationConstructor();
 
   DeviceOutputCommand steps(int steps, int duration) {
-    return DeviceOutputCommand._(OutputType.positionWithDuration, null, PercentOrSteps.fromSteps(steps), duration);
+    return DeviceOutputCommand(OutputType.positionWithDuration, null, PercentOrSteps.fromSteps(steps), duration);
   }
 
   DeviceOutputCommand percent(double percent, int duration) {
-    return DeviceOutputCommand._(OutputType.positionWithDuration, null, PercentOrSteps.fromPercent(percent), duration);
+    return DeviceOutputCommand(OutputType.positionWithDuration, null, PercentOrSteps.fromPercent(percent), duration);
   }
 }
 
 class DeviceOutput {
   static DeviceOutputValueConstructor get vibrate {
-    return DeviceOutputValueConstructor._(OutputType.vibrate);
+    return DeviceOutputValueConstructor(OutputType.vibrate);
   }
 
   static DeviceOutputValueConstructor get rotate {
-    return DeviceOutputValueConstructor._(OutputType.rotate);
+    return DeviceOutputValueConstructor(OutputType.rotate);
   }
 
   static DeviceOutputValueConstructor get oscillate {
-    return DeviceOutputValueConstructor._(OutputType.oscillate);
+    return DeviceOutputValueConstructor(OutputType.oscillate);
   }
 
   static DeviceOutputValueConstructor get constrict {
-    return DeviceOutputValueConstructor._(OutputType.constrict);
+    return DeviceOutputValueConstructor(OutputType.constrict);
   }
 
   static DeviceOutputValueConstructor get inflate {
-    return DeviceOutputValueConstructor._(OutputType.inflate);
+    return DeviceOutputValueConstructor(OutputType.inflate);
   }
 
   static DeviceOutputValueConstructor get temperature {
-    return DeviceOutputValueConstructor._(OutputType.temperature);
+    return DeviceOutputValueConstructor(OutputType.temperature);
   }
 
   static DeviceOutputValueConstructor get led {
-    return DeviceOutputValueConstructor._(OutputType.led);
+    return DeviceOutputValueConstructor(OutputType.led);
   }
 
   static DeviceOutputValueConstructor get spray {
-    return DeviceOutputValueConstructor._(OutputType.spray);
+    return DeviceOutputValueConstructor(OutputType.spray);
   }
 
   static DeviceOutputPositionConstructor get position {
-    return DeviceOutputPositionConstructor._();
+    return DeviceOutputPositionConstructor();
   }
 
   static DeviceOutputPositionWithDurationConstructor get positionWithDuration {
-    return DeviceOutputPositionWithDurationConstructor._();
+    return DeviceOutputPositionWithDurationConstructor();
   }
 }

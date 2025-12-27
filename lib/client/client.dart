@@ -1,4 +1,6 @@
-part of '../buttplug.dart';
+import 'dart:convert';
+
+import 'package:buttplug/buttplug.dart';
 
 class ButtplugClientException implements Exception {
   final String message;
@@ -26,18 +28,18 @@ class DeviceListReceivedEvent extends ButtplugClientEvent {
 class ButtplugClient {
   final String name;
   String? _serverName;
-  _ButtplugClientCommunicator? _communicator;
+  ButtplugClientCommunicator? _communicator;
   final Map<int, ButtplugClientDevice> _devices = {};
 
   ButtplugClient(this.name);
 
   Future<void> connect(ButtplugClientConnector connector) async {
-    _communicator = _ButtplugClientCommunicator(connector);
+    _communicator = ButtplugClientCommunicator(connector);
     connector.messageStream.listen((message) {
       if (message.deviceList != null) {
         for (var deviceInfo in message.deviceList!.devices.values) {
           if (!_devices.containsKey(deviceInfo.deviceIndex)) {
-            var device = ButtplugClientDevice._(deviceInfo, _communicator!);
+            var device = ButtplugClientDevice(deviceInfo, _communicator!);
             _devices[device.index] = device;
             _communicator!.eventStreamController.add(DeviceAddedEvent(device));
           }
@@ -45,7 +47,7 @@ class ButtplugClient {
         List<int> removedDevices = [];
         for (var index in _devices.keys) {
           if (_devices.keys
-              .where((x) => message.deviceList!.devices.values.where((y) => index == y.deviceIndex).isEmpty)
+              .where((x) => message.deviceList!.devices.values.where((y) => index == y.deviceIndex).isNotEmpty)
               .isEmpty) {
             removedDevices.add(index);
           }
@@ -80,7 +82,7 @@ class ButtplugClient {
     }
     var deviceList = deviceListWrapper.deviceList!;
     for (var device in deviceList.devices.values) {
-      _devices[device.deviceIndex] = ButtplugClientDevice._(device, _communicator!);
+      _devices[device.deviceIndex] = ButtplugClientDevice(device, _communicator!);
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-
 part 'messages.g.dart';
 
 @JsonEnum(fieldRename: FieldRename.pascal)

@@ -1,13 +1,19 @@
-part of '../buttplug.dart';
+import 'dart:async';
 
-class _ButtplugClientCommunicator {
+import 'package:buttplug/buttplug.dart';
+import 'package:loggy/loggy.dart';
+
+class ButtplugClientCommunicator {
   final StreamController<ButtplugClientEvent> eventStreamController = StreamController.broadcast();
   final ButtplugClientConnector _connector;
-  final _MessageSorter _sorter = _MessageSorter();
+  final MessageSorter _sorter = MessageSorter();
 
-  _ButtplugClientCommunicator(this._connector);
+  ButtplugClientCommunicator(this._connector) {
+    logInfo("CREATING COMMUNICATOR");
+  }
 
   Future<void> connect() async {
+    logInfo("CONNECTING");
     _connector.messageStream.listen((message) {
       if (message.id != 0) {
         _sorter.checkMessage(message);
@@ -25,11 +31,13 @@ class _ButtplugClientCommunicator {
   }
 
   Future<List<ButtplugServerMessage>> sendMessagesExpectReply(List<ButtplugClientMessage> messages) async {
-    return await Future.wait(messages.map((x) {
-      _sorter.prepareMessage(x);
-      _connector.send([x.asClientMessageUnion()]);
-      return _sorter.waitForMessage(x.id);
-    }));
+    return await Future.wait(
+      messages.map((x) {
+        _sorter.prepareMessage(x);
+        _connector.send([x.asClientMessageUnion()]);
+        return _sorter.waitForMessage(x.id);
+      }),
+    );
   }
 
   Future<ButtplugServerMessage> sendMessageExpectReply(ButtplugClientMessage message) async {

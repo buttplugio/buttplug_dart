@@ -1,4 +1,9 @@
-part of '../buttplug.dart';
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:buttplug/buttplug.dart';
+import 'package:loggy/loggy.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
   String address;
@@ -9,9 +14,7 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
 
   @override
   Future<void> connect() async {
-    _wsChannel = WebSocketChannel.connect(
-      Uri.parse('ws://127.0.0.1:12345'),
-    );
+    _wsChannel = WebSocketChannel.connect(Uri.parse('ws://127.0.0.1:12345'));
     await _wsChannel?.ready;
     _wsChannel!.stream.forEach((element) async {
       try {

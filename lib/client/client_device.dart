@@ -1,4 +1,8 @@
-part of '../buttplug.dart';
+import 'package:buttplug/client/client.dart';
+import 'package:buttplug/client/client_communicator.dart';
+import 'package:buttplug/client/client_device_command.dart';
+import 'package:buttplug/client/client_device_feature.dart';
+import 'package:buttplug/messages/messages.dart';
 
 class ButtplugClientDevice {
   late final int index;
@@ -6,16 +10,16 @@ class ButtplugClientDevice {
   late final String? displayName;
   late final int _messageTimingGap;
   late final Map<int, ButtplugClientDeviceFeature> features;
-  final _ButtplugClientCommunicator _communicator;
+  final ButtplugClientCommunicator _communicator;
 
-  ButtplugClientDevice._(DeviceInfo deviceInfo, this._communicator) {
+  ButtplugClientDevice(DeviceInfo deviceInfo, this._communicator) {
     index = deviceInfo.deviceIndex;
     name = deviceInfo.deviceName;
     displayName = deviceInfo.deviceDisplayName;
     _messageTimingGap = deviceInfo.deviceMessageTimingGap ?? 0;
     features = {
       for (var v in deviceInfo.deviceFeatures.values)
-        v.featureIndex: ButtplugClientDeviceFeature._(_communicator, index, v),
+        v.featureIndex: ButtplugClientDeviceFeature(_communicator, index, v),
     };
   }
 
@@ -30,7 +34,7 @@ class ButtplugClientDevice {
   Future<void> runOutput(DeviceOutputCommand cmd) async {
     var msgs = features.values
         .where((x) => x.feature.output != null && x.feature.output!.containsKey(cmd.outputType))
-        .map((x) => x._generateOutputCmd(cmd))
+        .map((x) => x.generateOutputCmd(cmd))
         .toList();
     if (msgs.isEmpty) {
       throw ButtplugClientDeviceException("$name does not support ${cmd.outputType} commands");

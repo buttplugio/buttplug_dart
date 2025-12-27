@@ -1,11 +1,11 @@
-part of '../buttplug.dart';
+import 'package:buttplug/buttplug.dart';
 
 class ButtplugClientDeviceFeature {
   final int deviceIndex;
   final ClientDeviceFeature feature;
-  final _ButtplugClientCommunicator _communicator;
+  final ButtplugClientCommunicator _communicator;
 
-  ButtplugClientDeviceFeature._(this._communicator, this.deviceIndex, this.feature);
+  ButtplugClientDeviceFeature(this._communicator, this.deviceIndex, this.feature);
 
   /*
   Future<List<int>> _sensorRead(SensorType sensorType) async {
@@ -30,7 +30,7 @@ class ButtplugClientDeviceFeature {
     }
   }
 
-  OutputCmd _generateOutputCmd(DeviceOutputCommand command) {
+  OutputCmd generateOutputCmd(DeviceOutputCommand command) {
     ClientDeviceFeatureOutput newCommand = ClientDeviceFeatureOutput();
     // Make sure the requested feature is valid
     _isOutputValid(command.outputType);
@@ -80,6 +80,6 @@ class ButtplugClientDeviceFeature {
   }
 
   Future<void> runOutput(DeviceOutputCommand cmd) async {
-    await _communicator.sendMessageExpectOk(_generateOutputCmd(cmd));
+    await _communicator.sendMessageExpectOk(generateOutputCmd(cmd));
   }
 }

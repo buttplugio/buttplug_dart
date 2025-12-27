@@ -1,4 +1,4 @@
-part of "../buttplug.dart";
+import 'package:buttplug/buttplug.dart';
 
 abstract class ButtplugClientConnector {
   Future<void> connect();
