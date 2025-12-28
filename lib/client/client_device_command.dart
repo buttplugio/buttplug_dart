@@ -38,18 +38,6 @@ class DeviceOutputValueConstructor {
   }
 }
 
-class DeviceOutputPositionConstructor {
-  DeviceOutputPositionConstructor();
-
-  DeviceOutputCommand steps(int steps) {
-    return DeviceOutputCommand(OutputType.position, null, PercentOrSteps.fromSteps(steps), null);
-  }
-
-  DeviceOutputCommand percent(double percent) {
-    return DeviceOutputCommand(OutputType.position, null, PercentOrSteps.fromPercent(percent), null);
-  }
-}
-
 class DeviceOutputPositionWithDurationConstructor {
   DeviceOutputPositionWithDurationConstructor();
 
@@ -95,8 +83,8 @@ class DeviceOutput {
     return DeviceOutputValueConstructor(OutputType.spray);
   }
 
-  static DeviceOutputPositionConstructor get position {
-    return DeviceOutputPositionConstructor();
+  static DeviceOutputValueConstructor get position {
+    return DeviceOutputValueConstructor(OutputType.position);
   }
 
   static DeviceOutputPositionWithDurationConstructor get positionWithDuration {
