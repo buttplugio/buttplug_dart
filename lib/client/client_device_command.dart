@@ -17,11 +17,10 @@ class PercentOrSteps {
 
 class DeviceOutputCommand {
   final OutputType outputType;
-  final PercentOrSteps? value;
-  final PercentOrSteps? position;
+  final PercentOrSteps value;
   final int? duration;
 
-  DeviceOutputCommand(this.outputType, this.value, this.position, this.duration);
+  DeviceOutputCommand(this.outputType, this.value, this.duration);
 }
 
 class DeviceOutputValueConstructor {
@@ -30,11 +29,11 @@ class DeviceOutputValueConstructor {
   DeviceOutputValueConstructor(this._outputType);
 
   DeviceOutputCommand steps(int steps) {
-    return DeviceOutputCommand(_outputType, PercentOrSteps.fromSteps(steps), null, null);
+    return DeviceOutputCommand(_outputType, PercentOrSteps.fromSteps(steps), null);
   }
 
   DeviceOutputCommand percent(double percent) {
-    return DeviceOutputCommand(_outputType, PercentOrSteps.fromPercent(percent), null, null);
+    return DeviceOutputCommand(_outputType, PercentOrSteps.fromPercent(percent), null);
   }
 }
 
@@ -42,11 +41,11 @@ class DeviceOutputPositionWithDurationConstructor {
   DeviceOutputPositionWithDurationConstructor();
 
   DeviceOutputCommand steps(int steps, int duration) {
-    return DeviceOutputCommand(OutputType.positionWithDuration, null, PercentOrSteps.fromSteps(steps), duration);
+    return DeviceOutputCommand(OutputType.positionWithDuration, PercentOrSteps.fromSteps(steps), duration);
   }
 
   DeviceOutputCommand percent(double percent, int duration) {
-    return DeviceOutputCommand(OutputType.positionWithDuration, null, PercentOrSteps.fromPercent(percent), duration);
+    return DeviceOutputCommand(OutputType.positionWithDuration, PercentOrSteps.fromPercent(percent), duration);
   }
 }
 

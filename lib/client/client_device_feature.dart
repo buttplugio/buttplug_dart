@@ -38,33 +38,19 @@ class ButtplugClientDeviceFeature {
     var type = command.outputType;
 
     if (type == OutputType.positionWithDuration) {
-      if (command.position == null) {
+      if (command.duration == null) {
         throw "PositionWithDuration requires position defined";
       }
-      var p = command.position;
-      if (p != null && p.percent == null) {
-        newCommand.position = command.position!.steps;
-      } else {
-        newCommand.position = (feature.output![type]!.position![1] * p!.percent!).ceil();
-      }
-      if (type == OutputType.positionWithDuration) {
-        if (command.duration == null) {
-          throw "PositionWithDuration requires duration defined";
-        }
-        newCommand.duration = command.duration;
-      }
-    } else {
-      if (command.value == null) {
-        throw "$type requires value defined";
-      }
-      var p = command.value;
-      if (p!.percent == null) {
-        // TODO Check step limits here
-        newCommand.value = command.value!.steps;
-      } else {
-        newCommand.value = (feature.output![type]!.value![1] * p.percent!).ceil();
-      }
+      newCommand.duration = command.duration;
     }
+    var p = command.value;
+    if (p!.percent == null) {
+      // TODO Check step limits here
+      newCommand.value = command.value.steps;
+    } else {
+      newCommand.value = (feature.output![type]!.value![1] * p.percent!).ceil();
+    }
+
     var msg = OutputCmd();
     msg.command[type] = newCommand;
     msg.deviceIndex = deviceIndex;

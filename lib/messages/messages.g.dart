@@ -12,33 +12,24 @@ ClientDeviceFeatureOutputInfo _$ClientDeviceFeatureOutputInfoFromJson(
   ..value = (json['Value'] as List<dynamic>?)
       ?.map((e) => (e as num).toInt())
       .toList()
-  ..position = (json['Position'] as List<dynamic>?)
-      ?.map((e) => (e as num).toInt())
-      .toList()
   ..duration = (json['Duration'] as List<dynamic>?)
       ?.map((e) => (e as num).toInt())
       .toList();
 
 Map<String, dynamic> _$ClientDeviceFeatureOutputInfoToJson(
   ClientDeviceFeatureOutputInfo instance,
-) => <String, dynamic>{
-  'Value': instance.value,
-  'Position': instance.position,
-  'Duration': instance.duration,
-};
+) => <String, dynamic>{'Value': instance.value, 'Duration': instance.duration};
 
 ClientDeviceFeatureOutput _$ClientDeviceFeatureOutputFromJson(
   Map<String, dynamic> json,
 ) => ClientDeviceFeatureOutput()
   ..value = (json['Value'] as num?)?.toInt()
-  ..position = (json['Position'] as num?)?.toInt()
   ..duration = (json['Duration'] as num?)?.toInt();
 
 Map<String, dynamic> _$ClientDeviceFeatureOutputToJson(
   ClientDeviceFeatureOutput instance,
 ) => <String, dynamic>{
   'Value': ?instance.value,
-  'Position': ?instance.position,
   'Duration': ?instance.duration,
 };
 

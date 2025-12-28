@@ -31,7 +31,6 @@ class ButtplugMessageException implements Exception {
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class ClientDeviceFeatureOutputInfo {
   List<int>? value;
-  List<int>? position;
   List<int>? duration;
   Map<String, dynamic> toJson() => _$ClientDeviceFeatureOutputInfoToJson(this);
   factory ClientDeviceFeatureOutputInfo.fromJson(Map<String, dynamic> json) =>
@@ -42,7 +41,6 @@ class ClientDeviceFeatureOutputInfo {
 @JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
 class ClientDeviceFeatureOutput {
   int? value;
-  int? position;
   int? duration;
   Map<String, dynamic> toJson() => _$ClientDeviceFeatureOutputToJson(this);
   factory ClientDeviceFeatureOutput.fromJson(Map<String, dynamic> json) => _$ClientDeviceFeatureOutputFromJson(json);
