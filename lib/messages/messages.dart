@@ -182,8 +182,8 @@ class OutputCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugC
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class InputCmd with ButtplugMessage, ButtplugDeviceMessage implements ButtplugClientMessage {
   int featureIndex = 0;
-  InputType inputType = InputType.unknown;
-  InputCommand inputCommandType = InputCommand.unknown;
+  InputType type = InputType.unknown;
+  InputCommand command = InputCommand.unknown;
   Map<String, dynamic> toJson() => _$InputCmdToJson(this);
   factory InputCmd.fromJson(Map<String, dynamic> json) => _$InputCmdFromJson(json);
   InputCmd();
@@ -253,7 +253,7 @@ class DeviceList with ButtplugMessage {
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class InputDataType {
-  int level = 0;
+  int value = 0;
   Map<String, dynamic> toJson() => _$InputDataTypeToJson(this);
   factory InputDataType.fromJson(Map<String, dynamic> json) => _$InputDataTypeFromJson(json);
   InputDataType();
@@ -262,7 +262,7 @@ class InputDataType {
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class InputReading with ButtplugMessage, ButtplugDeviceMessage {
   int featureIndex = 0;
-  Map<String, InputDataType> inputData = {};
+  Map<InputType, InputDataType> reading = {};
   Map<String, dynamic> toJson() => _$InputReadingToJson(this);
   factory InputReading.fromJson(Map<String, dynamic> json) => _$InputReadingFromJson(json);
   InputReading();

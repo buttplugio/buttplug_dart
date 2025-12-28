@@ -1,4 +1,5 @@
 import 'package:buttplug/buttplug.dart';
+import 'package:loggy/loggy.dart';
 
 class ButtplugClientDeviceFeature {
   final int deviceIndex;
@@ -6,23 +7,6 @@ class ButtplugClientDeviceFeature {
   final ButtplugClientCommunicator _communicator;
 
   ButtplugClientDeviceFeature(this._communicator, this.deviceIndex, this.feature);
-
-  /*
-  Future<List<int>> _sensorRead(SensorType sensorType) async {
-    if (feature.sensor == null) {
-      throw ButtplugClientDeviceException("${feature.description} does not have a readable sensor");
-    }
-    var sensorReadMsg = SensorReadCmd();
-    sensorReadMsg.deviceIndex = deviceIndex;
-    sensorReadMsg.sensorIndex = feature.featureIndex;
-    sensorReadMsg.sensorType = SensorType.values.byName(feature.featureType).toString();
-    ButtplugServerMessage returnMsg = await _communicator.sendMessageExpectReply(sensorReadMsg);
-    if (returnMsg.sensorReading == null) {
-      throw ButtplugClientDeviceException("Did not receive SensorReading back from SensorRead transaction");
-    }
-    return returnMsg.sensorReading!.data;
-  }
-  */
 
   void _isOutputValid(OutputType type) {
     if (feature.output != null && !feature.output!.containsKey(type)) {
@@ -44,7 +28,7 @@ class ButtplugClientDeviceFeature {
       newCommand.duration = command.duration;
     }
     var p = command.value;
-    if (p!.percent == null) {
+    if (p.percent == null) {
       // TODO Check step limits here
       newCommand.value = command.value.steps;
     } else {
@@ -67,5 +51,27 @@ class ButtplugClientDeviceFeature {
 
   Future<void> runOutput(DeviceOutputCommand cmd) async {
     await _communicator.sendMessageExpectOk(generateOutputCmd(cmd));
+  }
+
+  Future<Map<InputType, InputDataType>> readInput(InputType inputType) async {
+    if (feature.input == null) {
+      throw ButtplugClientDeviceException("${feature.featureDescription} does not have a readable input");
+    }
+    logInfo(feature.input!);
+    if (!feature.input!.containsKey(inputType)) {
+      throw ButtplugClientDeviceException("${feature.featureDescription} does not have input type $inputType");
+    }
+    var sensorReadMsg = InputCmd();
+    sensorReadMsg.deviceIndex = deviceIndex;
+    sensorReadMsg.featureIndex = feature.featureIndex;
+    sensorReadMsg.type = inputType;
+    sensorReadMsg.command = InputCommand.read;
+    logInfo("Sending reading");
+    ButtplugServerMessage returnMsg = await _communicator.sendMessageExpectReply(sensorReadMsg);
+    logInfo("Returning reading");
+    if (returnMsg.inputReading == null) {
+      throw ButtplugClientDeviceException("Did not receive InputReading back from InputCmd transaction");
+    }
+    return returnMsg.inputReading!.reading;
   }
 }

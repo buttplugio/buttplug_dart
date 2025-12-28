@@ -170,18 +170,15 @@ InputCmd _$InputCmdFromJson(Map<String, dynamic> json) => InputCmd()
   ..id = (json['Id'] as num).toInt()
   ..deviceIndex = (json['DeviceIndex'] as num).toInt()
   ..featureIndex = (json['FeatureIndex'] as num).toInt()
-  ..inputType = $enumDecode(_$InputTypeEnumMap, json['InputType'])
-  ..inputCommandType = $enumDecode(
-    _$InputCommandEnumMap,
-    json['InputCommandType'],
-  );
+  ..type = $enumDecode(_$InputTypeEnumMap, json['Type'])
+  ..command = $enumDecode(_$InputCommandEnumMap, json['Command']);
 
 Map<String, dynamic> _$InputCmdToJson(InputCmd instance) => <String, dynamic>{
   'Id': instance.id,
   'DeviceIndex': instance.deviceIndex,
   'FeatureIndex': instance.featureIndex,
-  'InputType': _$InputTypeEnumMap[instance.inputType]!,
-  'InputCommandType': _$InputCommandEnumMap[instance.inputCommandType]!,
+  'Type': _$InputTypeEnumMap[instance.type]!,
+  'Command': _$InputCommandEnumMap[instance.command]!,
 };
 
 const _$InputCommandEnumMap = {
@@ -268,17 +265,20 @@ Map<String, dynamic> _$DeviceListToJson(DeviceList instance) =>
     };
 
 InputDataType _$InputDataTypeFromJson(Map<String, dynamic> json) =>
-    InputDataType()..level = (json['Level'] as num).toInt();
+    InputDataType()..value = (json['Value'] as num).toInt();
 
 Map<String, dynamic> _$InputDataTypeToJson(InputDataType instance) =>
-    <String, dynamic>{'Level': instance.level};
+    <String, dynamic>{'Value': instance.value};
 
 InputReading _$InputReadingFromJson(Map<String, dynamic> json) => InputReading()
   ..id = (json['Id'] as num).toInt()
   ..deviceIndex = (json['DeviceIndex'] as num).toInt()
   ..featureIndex = (json['FeatureIndex'] as num).toInt()
-  ..inputData = (json['InputData'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(k, InputDataType.fromJson(e as Map<String, dynamic>)),
+  ..reading = (json['Reading'] as Map<String, dynamic>).map(
+    (k, e) => MapEntry(
+      $enumDecode(_$InputTypeEnumMap, k),
+      InputDataType.fromJson(e as Map<String, dynamic>),
+    ),
   );
 
 Map<String, dynamic> _$InputReadingToJson(InputReading instance) =>
@@ -286,7 +286,9 @@ Map<String, dynamic> _$InputReadingToJson(InputReading instance) =>
       'Id': instance.id,
       'DeviceIndex': instance.deviceIndex,
       'FeatureIndex': instance.featureIndex,
-      'InputData': instance.inputData,
+      'Reading': instance.reading.map(
+        (k, e) => MapEntry(_$InputTypeEnumMap[k]!, e),
+      ),
     };
 
 ButtplugServerMessage _$ButtplugServerMessageFromJson(

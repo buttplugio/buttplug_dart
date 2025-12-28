@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:buttplug/messages/messages.dart';
 import 'package:loggy/loggy.dart';
@@ -11,7 +12,7 @@ class _MessageCompletionFuture {
 
 class MessageSorter {
   int messageCounter = 1;
-  Map<int, _MessageCompletionFuture> waitingFutures = {};
+  final Map<int, _MessageCompletionFuture> _waitingFutures = {};
 
   MessageSorter();
 
@@ -24,7 +25,7 @@ class MessageSorter {
         responseCompleter.complete(msg);
       }
     });
-    waitingFutures[messageCounter] = _MessageCompletionFuture(
+    _waitingFutures[messageCounter] = _MessageCompletionFuture(
       responseStream.sink,
       Future(() async {
         return await responseCompleter.future;
@@ -34,18 +35,18 @@ class MessageSorter {
   }
 
   Future<ButtplugServerMessage> waitForMessage(int id) async {
-    if (!waitingFutures.containsKey(id)) {
+    if (!_waitingFutures.containsKey(id)) {
       logError("No message with $id currently being waited on");
       throw ButtplugMessageException("No message with $id currently being waited on");
     }
-    return await waitingFutures[id]!.completionFuture;
+    return await _waitingFutures[id]!.completionFuture;
   }
 
   void checkMessage(ButtplugServerMessage incoming) {
-    if (!waitingFutures.containsKey(incoming.id)) {
+    if (!_waitingFutures.containsKey(incoming.id)) {
       logWarning("No message with ${incoming.id} currently being waited on");
       return;
     }
-    waitingFutures[incoming.id]!.completionSink.add(incoming);
+    _waitingFutures[incoming.id]!.completionSink.add(incoming);
   }
 }

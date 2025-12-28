@@ -1,19 +1,15 @@
 import 'dart:async';
 
 import 'package:buttplug/buttplug.dart';
-import 'package:loggy/loggy.dart';
 
 class ButtplugClientCommunicator {
   final StreamController<ButtplugClientEvent> eventStreamController = StreamController.broadcast();
   final ButtplugClientConnector _connector;
   final MessageSorter _sorter = MessageSorter();
 
-  ButtplugClientCommunicator(this._connector) {
-    logInfo("CREATING COMMUNICATOR");
-  }
+  ButtplugClientCommunicator(this._connector) {}
 
   Future<void> connect() async {
-    logInfo("CONNECTING");
     _connector.messageStream.listen((message) {
       if (message.id != 0) {
         _sorter.checkMessage(message);

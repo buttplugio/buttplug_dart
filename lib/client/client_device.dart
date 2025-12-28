@@ -42,18 +42,18 @@ class ButtplugClientDevice {
     await _communicator.sendMessagesExpectOk(msgs);
   }
 
-  /*
   Future<int> battery() async {
-
-    var msgs = features
-        .where((x) => x.feature.featureType == SensorType.Battery.toString())
-        .map((x) => x.battery())
+    var msgs = features.values
+        .where((x) => x.feature.input != null && x.feature.input!.containsKey(InputType.battery))
+        .map((x) => x.readInput(InputType.battery))
         .toList();
     if (msgs.isEmpty) {
       throw ButtplugClientDeviceException("$name does not support battery commands");
     }
-    return await msgs[0];
-
+    var ret = await msgs[0];
+    if (!ret.containsKey(InputType.battery)) {
+      throw ButtplugClientDeviceException("Didn't get back battery return: $ret");
+    }
+    return ret[InputType.battery]!.value;
   }
-  */
 }

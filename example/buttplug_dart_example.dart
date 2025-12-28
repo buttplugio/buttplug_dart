@@ -1,5 +1,4 @@
 import 'package:buttplug/buttplug.dart';
-import 'package:buttplug/messages/messages.dart';
 import 'package:loggy/loggy.dart';
 
 void main() async {
