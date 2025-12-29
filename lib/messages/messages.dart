@@ -49,8 +49,8 @@ class ClientDeviceFeatureOutput {
 
 @JsonSerializable(fieldRename: FieldRename.pascal)
 class ClientDeviceFeatureInputInfo {
-  List<List<int>> valueRange = [];
-  List<String> inputCommands = [];
+  List<List<int>> value = [];
+  List<String> command = [];
   Map<String, dynamic> toJson() => _$ClientDeviceFeatureInputInfoToJson(this);
   factory ClientDeviceFeatureInputInfo.fromJson(Map<String, dynamic> json) =>
       _$ClientDeviceFeatureInputInfoFromJson(json);

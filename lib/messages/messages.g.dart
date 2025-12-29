@@ -36,19 +36,16 @@ Map<String, dynamic> _$ClientDeviceFeatureOutputToJson(
 ClientDeviceFeatureInputInfo _$ClientDeviceFeatureInputInfoFromJson(
   Map<String, dynamic> json,
 ) => ClientDeviceFeatureInputInfo()
-  ..valueRange = (json['ValueRange'] as List<dynamic>)
+  ..value = (json['Value'] as List<dynamic>)
       .map((e) => (e as List<dynamic>).map((e) => (e as num).toInt()).toList())
       .toList()
-  ..inputCommands = (json['InputCommands'] as List<dynamic>)
+  ..command = (json['Command'] as List<dynamic>)
       .map((e) => e as String)
       .toList();
 
 Map<String, dynamic> _$ClientDeviceFeatureInputInfoToJson(
   ClientDeviceFeatureInputInfo instance,
-) => <String, dynamic>{
-  'ValueRange': instance.valueRange,
-  'InputCommands': instance.inputCommands,
-};
+) => <String, dynamic>{'Value': instance.value, 'Command': instance.command};
 
 ClientDeviceFeature _$ClientDeviceFeatureFromJson(Map<String, dynamic> json) =>
     ClientDeviceFeature()
