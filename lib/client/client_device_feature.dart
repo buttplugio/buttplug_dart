@@ -66,9 +66,7 @@ class ButtplugClientDeviceFeature {
     sensorReadMsg.featureIndex = feature.featureIndex;
     sensorReadMsg.type = inputType;
     sensorReadMsg.command = InputCommand.read;
-    logInfo("Sending reading");
     ButtplugServerMessage returnMsg = await _communicator.sendMessageExpectReply(sensorReadMsg);
-    logInfo("Returning reading");
     if (returnMsg.inputReading == null) {
       throw ButtplugClientDeviceException("Did not receive InputReading back from InputCmd transaction");
     }
