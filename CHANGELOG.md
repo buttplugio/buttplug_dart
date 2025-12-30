@@ -1,3 +1,9 @@
+# 1.0.0 (2025-12-31)
+
+## Features
+
+- Update to Spec v4
+
 # 0.0.4 (2023-11-04)
 
 ## Bugfixes

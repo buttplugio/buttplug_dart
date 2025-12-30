@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:buttplug/messages/messages.dart';
 import 'package:loggy/loggy.dart';
