@@ -41,11 +41,11 @@ class DeviceOutputPositionWithDurationConstructor {
   DeviceOutputPositionWithDurationConstructor();
 
   DeviceOutputCommand steps(int steps, int duration) {
-    return DeviceOutputCommand(OutputType.positionWithDuration, PercentOrSteps.fromSteps(steps), duration);
+    return DeviceOutputCommand(OutputType.hwPositionWithDuration, PercentOrSteps.fromSteps(steps), duration);
   }
 
   DeviceOutputCommand percent(double percent, int duration) {
-    return DeviceOutputCommand(OutputType.positionWithDuration, PercentOrSteps.fromPercent(percent), duration);
+    return DeviceOutputCommand(OutputType.hwPositionWithDuration, PercentOrSteps.fromPercent(percent), duration);
   }
 }
 

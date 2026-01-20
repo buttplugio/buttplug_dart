@@ -103,7 +103,8 @@ class ButtplugClient {
   }
 
   Future<void> stopAllDevices() async {
-    await _communicator!.sendMessageExpectOk(StopAllDevices());
+    // StopCmd with no arguments stops everything
+    await _communicator!.sendMessageExpectOk(StopCmd());
   }
 
   String? get serverName => _serverName;

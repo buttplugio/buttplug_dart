@@ -93,7 +93,7 @@ const _$OutputTypeEnumMap = {
   OutputType.temperature: 'Temperature',
   OutputType.led: 'Led',
   OutputType.position: 'Position',
-  OutputType.positionWithDuration: 'PositionWithDuration',
+  OutputType.hwPositionWithDuration: 'HwPositionWithDuration',
   OutputType.unknown: 'Unknown',
 };
 
@@ -137,11 +137,29 @@ StopScanning _$StopScanningFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$StopScanningToJson(StopScanning instance) =>
     <String, dynamic>{'Id': instance.id};
 
-StopAllDevices _$StopAllDevicesFromJson(Map<String, dynamic> json) =>
-    StopAllDevices()..id = (json['Id'] as num).toInt();
+StopCmd _$StopCmdFromJson(Map<String, dynamic> json) => StopCmd()
+  ..id = (json['Id'] as num).toInt()
+  ..deviceIndex = (json['DeviceIndex'] as num?)?.toInt()
+  ..featureIndex = (json['FeatureIndex'] as num?)?.toInt()
+  ..inputs = json['Inputs'] as bool?
+  ..outputs = json['Outputs'] as bool?
+  ..command = (json['Command'] as Map<String, dynamic>).map(
+    (k, e) => MapEntry(
+      $enumDecode(_$OutputTypeEnumMap, k),
+      ClientDeviceFeatureOutput.fromJson(e as Map<String, dynamic>),
+    ),
+  );
 
-Map<String, dynamic> _$StopAllDevicesToJson(StopAllDevices instance) =>
-    <String, dynamic>{'Id': instance.id};
+Map<String, dynamic> _$StopCmdToJson(StopCmd instance) => <String, dynamic>{
+  'Id': instance.id,
+  'DeviceIndex': ?instance.deviceIndex,
+  'FeatureIndex': ?instance.featureIndex,
+  'Inputs': ?instance.inputs,
+  'Outputs': ?instance.outputs,
+  'Command': instance.command.map(
+    (k, e) => MapEntry(_$OutputTypeEnumMap[k]!, e),
+  ),
+};
 
 OutputCmd _$OutputCmdFromJson(Map<String, dynamic> json) => OutputCmd()
   ..id = (json['Id'] as num).toInt()
@@ -345,9 +363,9 @@ ButtplugClientMessageUnion _$ButtplugClientMessageUnionFromJson(
   ..stopScanning = json['StopScanning'] == null
       ? null
       : StopScanning.fromJson(json['StopScanning'] as Map<String, dynamic>)
-  ..stopAllDevices = json['StopAllDevices'] == null
+  ..stopCmd = json['StopCmd'] == null
       ? null
-      : StopAllDevices.fromJson(json['StopAllDevices'] as Map<String, dynamic>)
+      : StopCmd.fromJson(json['StopCmd'] as Map<String, dynamic>)
   ..outputCmd = json['OutputCmd'] == null
       ? null
       : OutputCmd.fromJson(json['OutputCmd'] as Map<String, dynamic>)
@@ -363,7 +381,7 @@ Map<String, dynamic> _$ButtplugClientMessageUnionToJson(
   'Ping': ?instance.ping,
   'StartScanning': ?instance.startScanning,
   'StopScanning': ?instance.stopScanning,
-  'StopAllDevices': ?instance.stopAllDevices,
+  'StopCmd': ?instance.stopCmd,
   'OutputCmd': ?instance.outputCmd,
   'InputCmd': ?instance.inputCmd,
 };

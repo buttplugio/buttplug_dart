@@ -12,7 +12,7 @@ enum OutputType {
   temperature,
   led,
   position,
-  positionWithDuration,
+  hwPositionWithDuration,
   unknown,
 }
 
@@ -151,15 +151,20 @@ class StopScanning with ButtplugMessage implements ButtplugClientMessage {
   }
 }
 
-@JsonSerializable(fieldRename: FieldRename.pascal)
-class StopAllDevices with ButtplugMessage implements ButtplugClientMessage {
-  Map<String, dynamic> toJson() => _$StopAllDevicesToJson(this);
-  factory StopAllDevices.fromJson(Map<String, dynamic> json) => _$StopAllDevicesFromJson(json);
-  StopAllDevices();
+@JsonSerializable(fieldRename: FieldRename.pascal, includeIfNull: false)
+class StopCmd with ButtplugMessage implements ButtplugClientMessage {
+  int? deviceIndex;
+  int? featureIndex;
+  bool? inputs;
+  bool? outputs;
+  Map<OutputType, ClientDeviceFeatureOutput> command = {};
+  Map<String, dynamic> toJson() => _$StopCmdToJson(this);
+  factory StopCmd.fromJson(Map<String, dynamic> json) => _$StopCmdFromJson(json);
+  StopCmd();
   @override
   ButtplugClientMessageUnion asClientMessageUnion() {
     var msg = ButtplugClientMessageUnion();
-    msg.stopAllDevices = this;
+    msg.stopCmd = this;
     return msg;
   }
 }
@@ -302,7 +307,7 @@ class ButtplugClientMessageUnion {
   Ping? ping;
   StartScanning? startScanning;
   StopScanning? stopScanning;
-  StopAllDevices? stopAllDevices;
+  StopCmd? stopCmd;
   OutputCmd? outputCmd;
   InputCmd? inputCmd;
 
@@ -318,7 +323,7 @@ class ButtplugClientMessageUnion {
     if (ping != null) return ping!.id;
     if (startScanning != null) return startScanning!.id;
     if (stopScanning != null) return stopScanning!.id;
-    if (stopAllDevices != null) return stopAllDevices!.id;
+    if (stopCmd != null) return stopCmd!.id;
     if (outputCmd != null) return outputCmd!.id;
     if (inputCmd != null) return inputCmd!.id;
     throw ButtplugMessageException("No client message id available");

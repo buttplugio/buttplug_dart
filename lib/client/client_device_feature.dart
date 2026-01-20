@@ -21,9 +21,9 @@ class ButtplugClientDeviceFeature {
 
     var type = command.outputType;
 
-    if (type == OutputType.positionWithDuration) {
+    if (type == OutputType.hwPositionWithDuration) {
       if (command.duration == null) {
-        throw "PositionWithDuration requires position defined";
+        throw "hwPositionWithDuration requires position defined";
       }
       newCommand.duration = command.duration;
     }
