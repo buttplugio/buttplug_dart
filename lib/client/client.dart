@@ -25,11 +25,16 @@ class DeviceListReceivedEvent extends ButtplugClientEvent {
   DeviceListReceivedEvent();
 }
 
+class DisconnectEvent extends ButtplugClientEvent {
+  DisconnectEvent();
+}
+
 class ButtplugClient {
   final String name;
   String? _serverName;
   ButtplugClientCommunicator? _communicator;
   final Map<int, ButtplugClientDevice> _devices = {};
+  bool _isConnected = false;
 
   ButtplugClient(this.name);
 
@@ -59,6 +64,8 @@ class ButtplugClient {
         }
         _communicator!.eventStreamController.add(DeviceListReceivedEvent());
       }
+    }, onDone: () {
+      _handleDisconnect();
     });
 
     await _communicator!.connect();
@@ -84,14 +91,24 @@ class ButtplugClient {
     for (var device in deviceList.devices.values) {
       _devices[device.deviceIndex] = ButtplugClientDevice(device, _communicator!);
     }
+    _isConnected = true;
   }
 
   bool connected() {
-    return true;
+    return _isConnected;
+  }
+
+  void _handleDisconnect() {
+    if (!_isConnected) return;
+    _isConnected = false;
+    _devices.clear();
+    _communicator?.eventStreamController.add(DisconnectEvent());
   }
 
   Future<void> disconnect() async {
-    await _communicator!.disconnect();
+    if (!_isConnected) return;
+    await _communicator?.disconnect();
+    _handleDisconnect();
   }
 
   Future<void> startScanning() async {
