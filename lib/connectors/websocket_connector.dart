@@ -14,31 +14,50 @@ class ButtplugWebsocketClientConnector implements ButtplugClientConnector {
 
   @override
   Future<void> connect() async {
-    _wsChannel = WebSocketChannel.connect(Uri.parse('ws://127.0.0.1:12345'));
+    _wsChannel = WebSocketChannel.connect(Uri.parse(address));
     await _wsChannel?.ready;
-    _wsChannel!.stream.forEach((element) async {
-      try {
-        logInfo(element);
-        List<dynamic> msgs = jsonDecode(element);
-        for (var msg in msgs) {
-          _serverMessageStream.add(ButtplugServerMessage.fromJson(msg));
+    _wsChannel!.stream.listen(
+      (element) {
+        try {
+          logInfo(element);
+          List<dynamic> msgs = jsonDecode(element);
+          for (var msg in msgs) {
+            _serverMessageStream.add(ButtplugServerMessage.fromJson(msg));
+          }
+        } catch (e, s) {
+          logError("Error adding message to stream: $e");
+          logError(s);
+          disconnect();
         }
-      } catch (e, s) {
-        logError("Error adding message to stream: $e");
-        logError(s);
-        await disconnect();
-      }
-    });
+      },
+      onError: (error) {
+        logError("WebSocket error: $error");
+        disconnect();
+      },
+      onDone: () {
+        logInfo("WebSocket connection closed");
+        disconnect();
+      },
+      cancelOnError: true,
+    );
   }
 
   @override
   Future<void> disconnect() async {
-    _wsChannel!.sink.close();
+    if (_wsChannel == null) return;
+    var ws = _wsChannel;
     _wsChannel = null;
+    try {
+      await ws?.sink.close();
+    } catch (_) {}
+    if (!_serverMessageStream.isClosed) {
+      await _serverMessageStream.close();
+    }
   }
 
   @override
   void send(List<ButtplugClientMessageUnion> messages) {
+    if (_wsChannel == null) return;
     String msg = jsonEncode(messages);
     _wsChannel!.sink.add(msg);
   }
