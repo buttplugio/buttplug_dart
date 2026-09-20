@@ -1,74 +1,156 @@
 import 'package:buttplug/buttplug.dart';
-import 'package:loggy/loggy.dart';
+
+class ButtplugClientDeviceFeatureCapabilityException extends ButtplugClientDeviceException {
+  ButtplugClientDeviceFeatureCapabilityException(super.message);
+}
+
+class ButtplugClientDeviceFeatureRangeException extends ButtplugClientDeviceException {
+  ButtplugClientDeviceFeatureRangeException(super.message);
+}
 
 class ButtplugClientDeviceFeature {
   final int deviceIndex;
   final ClientDeviceFeature feature;
   final ButtplugClientCommunicator _communicator;
+  bool _valid = true;
 
   ButtplugClientDeviceFeature(this._communicator, this.deviceIndex, this.feature);
 
-  void _isOutputValid(OutputType type) {
-    if (feature.output != null && !feature.output!.containsKey(type)) {
-      throw "Feature index ${feature.featureIndex} does not support type $type for device";
+  void markDisconnected() {
+    _valid = false;
+  }
+
+  void _ensureValid() {
+    if (!_valid) {
+      throw ButtplugClientDeviceException('Device feature is disconnected');
     }
+  }
+
+  ClientDeviceFeatureOutputInfo _outputInfo(OutputType type) {
+    final output = feature.output;
+    if (output == null || !output.containsKey(type)) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '${feature.featureDescription} does not support $type output',
+      );
+    }
+    final info = output[type];
+    if (info == null || info.value == null || info.value!.length < 2) {
+      throw ButtplugClientDeviceFeatureRangeException(
+        '${feature.featureDescription} has no valid value range for $type output',
+      );
+    }
+    return info;
+  }
+
+  List<int> _range(List<int>? range, String name) {
+    if (range == null || range.length < 2 || range[0] > range[1]) {
+      throw ButtplugClientDeviceFeatureRangeException(
+        '${feature.featureDescription} has no valid $name range',
+      );
+    }
+    return range;
+  }
+
+  int _outputValue(DeviceOutputCommand command, ClientDeviceFeatureOutputInfo info) {
+    final range = _range(info.value, 'value');
+    final value = command.value;
+    final positional = command.outputType == OutputType.position ||
+        command.outputType == OutputType.hwPositionWithDuration;
+    if (value.steps != null) {
+      final steps = value.steps!;
+      if (steps == 0 && !positional) {
+        return 0;
+      }
+      if (steps < range[0] || steps > range[1]) {
+        throw ButtplugClientDeviceFeatureRangeException(
+          '${feature.featureDescription} $steps is outside value range [${range[0]}, ${range[1]}]',
+        );
+      }
+      return steps;
+    }
+
+    final percent = value.percent!;
+    if (!percent.isFinite || percent < 0 || percent > 1) {
+      throw ButtplugClientDeviceFeatureRangeException(
+        '${feature.featureDescription} percentage must be finite and between 0 and 1',
+      );
+    }
+    if (percent == 0 && !positional) {
+      return 0;
+    }
+    if (!positional) {
+      return (range[1] * percent).ceil().clamp(range[0], range[1]);
+    }
+    final span = range[1] - range[0];
+    return (range[0] + span * percent).ceil().clamp(range[0], range[1]);
   }
 
   OutputCmd generateOutputCmd(DeviceOutputCommand command) {
-    ClientDeviceFeatureOutput newCommand = ClientDeviceFeatureOutput();
-    // Make sure the requested feature is valid
-    _isOutputValid(command.outputType);
+    _ensureValid();
+    final info = _outputInfo(command.outputType);
+    final newCommand = ClientDeviceFeatureOutput()..value = _outputValue(command, info);
 
-    var type = command.outputType;
-
-    if (type == OutputType.hwPositionWithDuration) {
-      if (command.duration == null) {
-        throw "hwPositionWithDuration requires position defined";
+    if (command.outputType == OutputType.hwPositionWithDuration) {
+      final duration = command.duration;
+      if (duration == null) {
+        throw ButtplugClientDeviceFeatureCapabilityException(
+          'hwPositionWithDuration requires a duration',
+        );
       }
-      newCommand.duration = command.duration;
-    }
-    var p = command.value;
-    if (p.percent == null) {
-      // TODO Check step limits here
-      newCommand.value = command.value.steps;
-    } else {
-      newCommand.value = (feature.output![type]!.value![1] * p.percent!).ceil();
+      final durationRange = _range(info.duration, 'duration');
+      if (duration < durationRange[0] || duration > durationRange[1] || duration < 0) {
+        throw ButtplugClientDeviceFeatureRangeException(
+          '${feature.featureDescription} duration $duration is outside range [${durationRange[0]}, ${durationRange[1]}]',
+        );
+      }
+      newCommand.duration = duration;
     }
 
-    var msg = OutputCmd();
-    msg.command[type] = newCommand;
-    msg.deviceIndex = deviceIndex;
-    msg.featureIndex = feature.featureIndex;
+    final msg = OutputCmd()
+      ..command[command.outputType] = newCommand
+      ..deviceIndex = deviceIndex
+      ..featureIndex = feature.featureIndex;
     return msg;
   }
 
-  bool hasOutput(OutputType type) {
-    if (feature.output != null) {
-      return feature.output!.containsKey(type);
-    }
-    return false;
-  }
+  bool hasOutput(OutputType type) => _valid && (feature.output?.containsKey(type) ?? false);
 
   Future<void> runOutput(DeviceOutputCommand cmd) async {
+    _ensureValid();
     await _communicator.sendMessageExpectOk(generateOutputCmd(cmd));
   }
 
   Future<Map<InputType, InputDataType>> readInput(InputType inputType) async {
-    if (feature.input == null) {
-      throw ButtplugClientDeviceException("${feature.featureDescription} does not have a readable input");
+    _ensureValid();
+    final input = feature.input;
+    if (input == null) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '${feature.featureDescription} does not have a readable input',
+      );
     }
-    logInfo(feature.input!);
-    if (!feature.input!.containsKey(inputType)) {
-      throw ButtplugClientDeviceException("${feature.featureDescription} does not have input type $inputType");
+    final inputInfo = input[inputType];
+    if (inputInfo == null) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '${feature.featureDescription} does not have input type $inputType',
+      );
     }
-    var sensorReadMsg = InputCmd();
-    sensorReadMsg.deviceIndex = deviceIndex;
-    sensorReadMsg.featureIndex = feature.featureIndex;
-    sensorReadMsg.type = inputType;
-    sensorReadMsg.command = InputCommand.read;
-    ButtplugServerMessage returnMsg = await _communicator.sendMessageExpectReply(sensorReadMsg);
+    final supportsRead = inputInfo.command.any((command) => command.toLowerCase() == InputCommand.read.name.toLowerCase());
+    if (!supportsRead) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '${feature.featureDescription} does not support Read for $inputType',
+      );
+    }
+
+    final sensorReadMsg = InputCmd()
+      ..deviceIndex = deviceIndex
+      ..featureIndex = feature.featureIndex
+      ..type = inputType
+      ..command = InputCommand.read;
+    final returnMsg = await _communicator.sendMessageExpectReply(sensorReadMsg);
     if (returnMsg.inputReading == null) {
-      throw ButtplugClientDeviceException("Did not receive InputReading back from InputCmd transaction");
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        'Did not receive InputReading back from InputCmd transaction',
+      );
     }
     return returnMsg.inputReading!.reading;
   }

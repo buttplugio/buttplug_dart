@@ -11,6 +11,7 @@ class ButtplugClientDevice {
   late final int _messageTimingGap;
   late final Map<int, ButtplugClientDeviceFeature> features;
   final ButtplugClientCommunicator _communicator;
+  bool _locallyDisconnected = false;
 
   ButtplugClientDevice(DeviceInfo deviceInfo, this._communicator) {
     index = deviceInfo.deviceIndex;
@@ -23,37 +24,54 @@ class ButtplugClientDevice {
     };
   }
 
-  bool get connected {
-    return true;
+  bool get connected => !_locallyDisconnected && _communicator.connected();
+
+  void markDisconnected() {
+    _locallyDisconnected = true;
+    for (final feature in features.values) {
+      feature.markDisconnected();
+    }
   }
 
-  int get messageTimingGap {
-    return _messageTimingGap;
+  void _ensureConnected() {
+    if (!connected) {
+      throw ButtplugClientDeviceException('$name is disconnected');
+    }
   }
+
+  int get messageTimingGap => _messageTimingGap;
 
   Future<void> runOutput(DeviceOutputCommand cmd) async {
-    var msgs = features.values
-        .where((x) => x.feature.output != null && x.feature.output!.containsKey(cmd.outputType))
-        .map((x) => x.generateOutputCmd(cmd))
-        .toList();
-    if (msgs.isEmpty) {
-      throw ButtplugClientDeviceException("$name does not support ${cmd.outputType} commands");
+    _ensureConnected();
+    final matching = features.values.where((x) => x.hasOutput(cmd.outputType)).toList();
+    if (matching.isEmpty) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '$name does not support ${cmd.outputType} commands',
+      );
     }
-    await _communicator.sendMessagesExpectOk(msgs);
+    await _communicator.sendMessagesExpectOk(
+      matching.map((feature) => feature.generateOutputCmd(cmd)).toList(),
+    );
   }
 
   Future<int> battery() async {
-    var msgs = features.values
-        .where((x) => x.feature.input != null && x.feature.input!.containsKey(InputType.battery))
-        .map((x) => x.readInput(InputType.battery))
-        .toList();
-    if (msgs.isEmpty) {
-      throw ButtplugClientDeviceException("$name does not support battery commands");
+    _ensureConnected();
+    final batteryFeature = features.values.cast<ButtplugClientDeviceFeature?>().firstWhere(
+      (feature) => feature!.feature.input?[InputType.battery]?.command.any(
+            (command) => command.toLowerCase() == InputCommand.read.name.toLowerCase(),
+          ) ?? false,
+      orElse: () => null,
+    );
+    if (batteryFeature == null) {
+      throw ButtplugClientDeviceFeatureCapabilityException(
+        '$name does not support readable battery commands',
+      );
     }
-    var ret = await msgs[0];
-    if (!ret.containsKey(InputType.battery)) {
-      throw ButtplugClientDeviceException("Didn't get back battery return: $ret");
+    final ret = await batteryFeature.readInput(InputType.battery);
+    final battery = ret[InputType.battery];
+    if (battery == null) {
+      throw ButtplugClientDeviceFeatureCapabilityException("Didn't get back battery return: $ret");
     }
-    return ret[InputType.battery]!.value;
+    return battery.value;
   }
 }

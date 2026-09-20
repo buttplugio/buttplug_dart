@@ -28,10 +28,17 @@ class DeviceOutputValueConstructor {
 
   DeviceOutputValueConstructor(this._outputType);
 
+  /// Creates a command using a device-native integer value.
+  ///
+  /// The value is validated against the feature's advertised range when sent.
   DeviceOutputCommand steps(int steps) {
     return DeviceOutputCommand(_outputType, PercentOrSteps.fromSteps(steps), null);
   }
 
+  /// Creates a command using a percentage in the inclusive range [0, 1].
+  ///
+  /// For stop-capable outputs, zero is sent as the literal stop value. Position
+  /// outputs map percentages across their advertised inclusive range.
   DeviceOutputCommand percent(double percent) {
     return DeviceOutputCommand(_outputType, PercentOrSteps.fromPercent(percent), null);
   }
@@ -40,10 +47,12 @@ class DeviceOutputValueConstructor {
 class DeviceOutputPositionWithDurationConstructor {
   DeviceOutputPositionWithDurationConstructor();
 
+  /// Creates a position command using native value and duration units.
   DeviceOutputCommand steps(int steps, int duration) {
     return DeviceOutputCommand(OutputType.hwPositionWithDuration, PercentOrSteps.fromSteps(steps), duration);
   }
 
+  /// Creates a position command mapped across the advertised range.
   DeviceOutputCommand percent(double percent, int duration) {
     return DeviceOutputCommand(OutputType.hwPositionWithDuration, PercentOrSteps.fromPercent(percent), duration);
   }

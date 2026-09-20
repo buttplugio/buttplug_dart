@@ -3,49 +3,50 @@ import 'dart:async';
 import 'package:buttplug/messages/messages.dart';
 import 'package:loggy/loggy.dart';
 
-class _MessageCompletionFuture {
-  Future<ButtplugServerMessage> completionFuture;
-  Sink<ButtplugServerMessage> completionSink;
-  _MessageCompletionFuture(this.completionSink, this.completionFuture);
-}
-
 class MessageSorter {
   int messageCounter = 1;
-  final Map<int, _MessageCompletionFuture> _waitingFutures = {};
+  final Map<int, Completer<ButtplugServerMessage>> _waitingFutures = {};
 
   MessageSorter();
 
   void prepareMessage(ButtplugMessage outgoing) {
     outgoing.id = messageCounter;
-    StreamController<ButtplugServerMessage> responseStream = StreamController();
-    var responseCompleter = Completer<ButtplugServerMessage>();
-    responseStream.stream.listen((ButtplugServerMessage msg) {
-      if (!responseCompleter.isCompleted) {
-        responseCompleter.complete(msg);
-      }
-    });
-    _waitingFutures[messageCounter] = _MessageCompletionFuture(
-      responseStream.sink,
-      Future(() async {
-        return await responseCompleter.future;
-      }),
-    );
+    _waitingFutures[messageCounter] = Completer<ButtplugServerMessage>();
     messageCounter += 1;
   }
 
   Future<ButtplugServerMessage> waitForMessage(int id) async {
-    if (!_waitingFutures.containsKey(id)) {
+    final completer = _waitingFutures[id];
+    if (completer == null) {
       logError("No message with $id currently being waited on");
       throw ButtplugMessageException("No message with $id currently being waited on");
     }
-    return await _waitingFutures[id]!.completionFuture;
+    try {
+      return await completer.future;
+    } finally {
+      _waitingFutures.remove(id);
+    }
   }
 
   void checkMessage(ButtplugServerMessage incoming) {
-    if (!_waitingFutures.containsKey(incoming.id)) {
+    final completer = _waitingFutures[incoming.id];
+    if (completer == null) {
       logWarning("No message with ${incoming.id} currently being waited on");
       return;
     }
-    _waitingFutures[incoming.id]!.completionSink.add(incoming);
+    if (!completer.isCompleted) {
+      completer.complete(incoming);
+    }
+  }
+
+  bool get hasPending => _waitingFutures.isNotEmpty;
+
+  void failAll(Object error, [StackTrace? stackTrace]) {
+    for (final completer in _waitingFutures.values) {
+      if (!completer.isCompleted) {
+        completer.completeError(error, stackTrace);
+      }
+    }
+    _waitingFutures.clear();
   }
 }
