@@ -142,13 +142,7 @@ StopCmd _$StopCmdFromJson(Map<String, dynamic> json) => StopCmd()
   ..deviceIndex = (json['DeviceIndex'] as num?)?.toInt()
   ..featureIndex = (json['FeatureIndex'] as num?)?.toInt()
   ..inputs = json['Inputs'] as bool?
-  ..outputs = json['Outputs'] as bool?
-  ..command = (json['Command'] as Map<String, dynamic>).map(
-    (k, e) => MapEntry(
-      $enumDecode(_$OutputTypeEnumMap, k),
-      ClientDeviceFeatureOutput.fromJson(e as Map<String, dynamic>),
-    ),
-  );
+  ..outputs = json['Outputs'] as bool?;
 
 Map<String, dynamic> _$StopCmdToJson(StopCmd instance) => <String, dynamic>{
   'Id': instance.id,
@@ -156,9 +150,6 @@ Map<String, dynamic> _$StopCmdToJson(StopCmd instance) => <String, dynamic>{
   'FeatureIndex': ?instance.featureIndex,
   'Inputs': ?instance.inputs,
   'Outputs': ?instance.outputs,
-  'Command': instance.command.map(
-    (k, e) => MapEntry(_$OutputTypeEnumMap[k]!, e),
-  ),
 };
 
 OutputCmd _$OutputCmdFromJson(Map<String, dynamic> json) => OutputCmd()

@@ -157,7 +157,6 @@ class StopCmd with ButtplugMessage implements ButtplugClientMessage {
   int? featureIndex;
   bool? inputs;
   bool? outputs;
-  Map<OutputType, ClientDeviceFeatureOutput> command = {};
   Map<String, dynamic> toJson() => _$StopCmdToJson(this);
   factory StopCmd.fromJson(Map<String, dynamic> json) => _$StopCmdFromJson(json);
   StopCmd();
