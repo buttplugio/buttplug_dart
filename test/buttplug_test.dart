@@ -6,30 +6,23 @@ import 'package:test/test.dart';
 
 void main() {
   group('Message de/serialization', () {
-    setUp(() {
-      // Additional setup goes here.
-    });
-
-    /*
     test('Message Union Formatting', () {
-      var ok = Ok();
-      ok.id = 5;
-      var serverOk = ButtplugServerMessage();
-      serverOk.ok = ok;
+      var ok = Ok()..id = 5;
+      var serverOk = ButtplugServerMessage()..ok = ok;
       var jsonString = jsonEncode(serverOk);
       expect(jsonString, equals('{"Ok":{"Id":5}}'));
     });
-*/
+
     test('Device List Deserialization', () {
       var incoming =
-          '[{"DeviceList":{"Id":2,"Devices":{"0":{"DeviceIndex":0,"DeviceName":"Lovense Ridge","DeviceMessageTimingGap":100,"DeviceFeatures":{"0":{"FeatureIndex":0,"FeatureDescription":"","Output":{"Vibrate":{"Value":[0,20]}}},"1":{"FeatureIndex":1,"FeatureDescription":"","Output":{"Rotate":{"Value":[-20,20]}}},"2":{"FeatureIndex":2,"FeatureDescription":"battery Level","Input":{"Battery":{"ValueRange":[[0,100]],"InputCommands":["Read"]}}}}}}}}]';
+          '[{"DeviceList":{"Id":2,"Devices":{"0":{"DeviceIndex":0,"DeviceName":"Lovense Ridge","DeviceMessageTimingGap":100,"DeviceFeatures":{"0":{"FeatureIndex":0,"FeatureDescription":"","Output":{"Vibrate":{"Value":[0,20]}}},"1":{"FeatureIndex":1,"FeatureDescription":"","Output":{"Rotate":{"Value":[-20,20]}}},"2":{"FeatureIndex":2,"FeatureDescription":"battery Level","Input":{"Battery":{"Value":[[0,100]],"Command":["Read"]}}}}}}}}]';
       List<dynamic> messageList = jsonDecode(incoming);
       var message = ButtplugServerMessage.fromJson(messageList[0]);
       expect(message.deviceList, isNotNull);
       var deviceAdded = message.deviceList!.devices[0]!;
-      expect(deviceAdded.deviceName, equals("Lovense Ridge"));
+      expect(deviceAdded.deviceName, equals('Lovense Ridge'));
     });
-    /*
+
     test('Handle deserializing list of Buttplug Server Messages', () {
       var incoming = '[{"Ok": {"Id":5}}]';
       List<dynamic> msgs = jsonDecode(incoming);
@@ -39,7 +32,6 @@ void main() {
         expect(message.ok!.id, equals(5));
       }
     });
-      */
   });
 
   group('Client Disconnection and Events', () {
@@ -52,14 +44,10 @@ void main() {
       final client = ButtplugClient('Test Client');
       final connector = MockConnector();
 
-      // Start connection in background
       final connectFuture = client.connect(connector);
 
-      // Wait a microtask for the client to send RequestServerInfo
-      await Future.delayed(Duration(milliseconds: 10));
-
-      // Simulate handshake server messages:
-      // 1. ServerInfo (matching the request ID)
+      // Respond to the handshake requests only after the client has sent them.
+      await connector.sentMessageIds.first;
       final serverInfo = ButtplugServerMessage()
         ..serverInfo = (ServerInfo()
           ..id = connector.lastMessageId
@@ -68,10 +56,7 @@ void main() {
           ..protocolVersionMinor = 0);
       connector.simulateServerMessage(serverInfo);
 
-      // Wait a microtask for the client to send RequestDeviceList
-      await Future.delayed(Duration(milliseconds: 10));
-
-      // 2. DeviceList (matching the request ID)
+      await connector.sentMessageIds.first;
       final deviceList = ButtplugServerMessage()
         ..deviceList = (DeviceList()
           ..id = connector.lastMessageId
@@ -79,31 +64,28 @@ void main() {
       connector.simulateServerMessage(deviceList);
 
       await connectFuture;
-
       expect(client.connected(), isTrue);
 
-      // Listen for DisconnectEvent
-      ButtplugClientEvent? receivedEvent;
-      client.eventStream.listen((event) {
-        receivedEvent = event;
-      });
-
-      // Simulate connection drop
+      final disconnectFuture = client.eventStream.firstWhere(
+        (event) => event is DisconnectEvent,
+      );
       connector.simulateDisconnect();
-
-      // Wait a microtask to let the stream events propagate
-      await Future.delayed(Duration(milliseconds: 10));
+      await disconnectFuture;
 
       expect(client.connected(), isFalse);
-      expect(receivedEvent, isA<DisconnectEvent>());
     });
   });
 }
 
 class MockConnector implements ButtplugClientConnector {
-  final StreamController<ButtplugServerMessage> _messageStreamController = StreamController.broadcast();
+  final StreamController<ButtplugServerMessage> _messageStreamController =
+      StreamController.broadcast();
+  final StreamController<int> _sentMessageController =
+      StreamController.broadcast();
   int lastMessageId = 0;
   bool isConnected = false;
+
+  Stream<int> get sentMessageIds => _sentMessageController.stream;
 
   @override
   Future<void> connect() async {
@@ -114,17 +96,20 @@ class MockConnector implements ButtplugClientConnector {
   Future<void> disconnect() async {
     isConnected = false;
     await _messageStreamController.close();
+    await _sentMessageController.close();
   }
 
   @override
   void send(List<ButtplugClientMessageUnion> messages) {
     if (messages.isNotEmpty) {
       lastMessageId = messages[0].id;
+      _sentMessageController.add(lastMessageId);
     }
   }
 
   @override
-  Stream<ButtplugServerMessage> get messageStream => _messageStreamController.stream;
+  Stream<ButtplugServerMessage> get messageStream =>
+      _messageStreamController.stream;
 
   void simulateServerMessage(ButtplugServerMessage message) {
     _messageStreamController.add(message);
